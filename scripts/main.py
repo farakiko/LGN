@@ -20,15 +20,15 @@ def main(args):
 
 if __name__ == "__main__":
 
-    #args = setup_argparse()
+    args = setup_argparse()
 
-    # the next part initializes some args values (to run the script not from terminal)
-    class objectview(object):
-        def __init__(self, d):
-            self.__dict__ = d
-
-    args = objectview({'num_epoch': 6, 'batch_size': 2, 'num_train': 1, 'num_test': 1, 'num_valid': 1, 'scale':1, 'nobj':None,
-                        'shuffle':False, 'add_beams':False, 'beam_mass':1, 'num_wrokers': 0})
+    # # the next part initializes some args values (to run the script not from terminal)
+    # class objectview(object):
+    #     def __init__(self, d):
+    #         self.__dict__ = d
+    #
+    # args = objectview({'num_epoch': 6, 'batch_size': 2, 'num_train': 1, 'num_test': 1, 'num_valid': 1, 'scale':1, 'nobj':None,
+    #                     'shuffle':False, 'add_beams':False, 'beam_mass':1, 'num_wrokers': 0})
 
     train_loader = main(args)
 
