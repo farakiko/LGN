@@ -325,29 +325,29 @@ def data_to_loader_2(args, torch_datasets):
 
 
 #-----------------------------------------------------------------------------------------------------
-# test the data loader to get familiar with the data that we feed to the model:
-class objectview(object):
-    def __init__(self, d):
-        self.__dict__ = d
-
-args = objectview({'num_epoch': 6, 'batch_size': 2, 'num_train': 4, 'num_test': 1, 'num_valid': 1, 'scale':1, 'nobj':None,
-                    'shuffle':False, 'add_beams':False, 'beam_mass':1, 'num_wrokers': 0})
-
-args, torch_datasets = initialize_datasets(args, datadir='../../data', num_pts=None)
-
-train_loader, test_loader, valid_loader = data_to_loader_1(args, torch_datasets)
-
-next(iter(train_loader))
-# Batch(Nobj=[1], Pmu=[200, 4], atom_mask=[200], edge_mask=[200, 200], is_signal=[1], jet_pt=[1], label=[200], mass=[200], truth_Pmu=[4])
-# Nobj: length=1 signifies 1 jet.. the element stored in Nobj is the # of actual tracks (ranges from 1 to 200)
-# Pmu: p4 of each track (capped at 200)
-# jet_pt: total jet momentum
-# mass: mass of each track
-# truth_Pmu: p4 of jet
-# is_signal: binary (0 or 1)
-# label: 1 for actual track, 0 for zero-padded track
-
-
-train_loader, test_loader, valid_loader = data_to_loader_2(args, torch_datasets)
-
-next(iter(train_loader))
+# # test the data loader to get familiar with the data that we feed to the model:
+# class objectview(object):
+#     def __init__(self, d):
+#         self.__dict__ = d
+#
+# args = objectview({'num_epoch': 6, 'batch_size': 2, 'num_train': 4, 'num_test': 1, 'num_valid': 1, 'scale':1, 'nobj':None,
+#                     'shuffle':False, 'add_beams':False, 'beam_mass':1, 'num_wrokers': 0})
+#
+# args, torch_datasets = initialize_datasets(args, datadir='../../data', num_pts=None)
+#
+# train_loader, test_loader, valid_loader = data_to_loader_1(args, torch_datasets)
+#
+# next(iter(train_loader))
+# # Batch(Nobj=[1], Pmu=[200, 4], atom_mask=[200], edge_mask=[200, 200], is_signal=[1], jet_pt=[1], label=[200], mass=[200], truth_Pmu=[4])
+# # Nobj: length=1 signifies 1 jet.. the element stored in Nobj is the # of actual tracks (ranges from 1 to 200)
+# # Pmu: p4 of each track (capped at 200)
+# # jet_pt: total jet momentum
+# # mass: mass of each track
+# # truth_Pmu: p4 of jet
+# # is_signal: binary (0 or 1)
+# # label: 1 for actual track, 0 for zero-padded track
+#
+#
+# train_loader, test_loader, valid_loader = data_to_loader_2(args, torch_datasets)
+#
+# next(iter(train_loader))
