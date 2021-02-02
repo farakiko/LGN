@@ -1,6 +1,8 @@
 import torch
 
 import logging
+import sys
+sys.path.insert(1, '../../')
 
 from lgn.cg_lib import CGModule, ZonalFunctionsRel, ZonalFunctions, normsq4
 from lgn.g_lib import GTau
