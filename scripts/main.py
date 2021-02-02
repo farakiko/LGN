@@ -24,14 +24,15 @@ def main(args):
     elif args.dtype == 'float':
         dtype = torch.float
 
-    # # Initialize model
-    # model = LGNTopTag(args.maxdim, args.max_zf, args.num_cg_levels, args.num_channels,
-    #                   args.cutoff_type, args.hard_cut_rad, args.soft_cut_rad, args.soft_cut_width,
-    #                   args.weight_init, args.level_gain, args.num_basis_fn,
-    #                   args.top, args.input, args.num_mpnn_levels, activation=args.activation, pmu_in=args.pmu_in, add_beams=args.add_beams,
-    #                   mlp=args.mlp, mlp_depth=args.mlp_depth, mlp_width=args.mlp_width,
-    #                   scale=1., full_scalars=args.full_scalars,
-    #                   device=device, dtype=dtype)
+    # Initialize model
+    model = LGNTopTag(args.maxdim, args.max_zf, args.num_cg_levels, args.num_channels,
+                      args.weight_init, args.level_gain, args.num_basis_fn,
+                      args.top, args.input, args.num_mpnn_levels, activation=args.activation, pmu_in=args.pmu_in, add_beams=args.add_beams,
+                      mlp=args.mlp, mlp_depth=args.mlp_depth, mlp_width=args.mlp_width,
+                      scale=1., full_scalars=args.full_scalars,
+                      device=device, dtype=dtype)
+    model
+
 
     return train_loader
 
@@ -51,7 +52,7 @@ if __name__ == "__main__":
     #                    'weight_init': 'randn', 'level_gain':[1.], 'num_basis_fn':10,
     #                    'top': 'linear', 'input': 'linear', 'num_mpnn_levels': 1,
     #                    'activation': 'leakyrelu', 'pmu_in': False, 'add_beams': True,
-    #                    'mlp': True, 'mlp_depth': 3, 'mlp_width': 2, 'full_scalars': False})
+    #                    'mlp': True, 'mlp_depth': 3, 'mlp_width': 2, 'full_scalars': False, 'dtype': 'float'})
 
     train_loader = main(args)
 

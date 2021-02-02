@@ -199,7 +199,7 @@ class LGNTopTag(CGModule):
         atom_mask = data['atom_mask'].to(device, torch.uint8)
         edge_mask = data['edge_mask'].to(device, torch.uint8)
 
-        scalars = torch.ones_like(atom_ps[:, 0]).unsqueeze(-1)
+        scalars = torch.ones_like(atom_ps[:,:, 0]).unsqueeze(-1)
         scalars = normsq4(atom_ps).abs().sqrt().unsqueeze(-1)
 
         if 'scalars' in data.keys:
@@ -265,4 +265,3 @@ def expand_var_list(var, num_cg_levels):
 # for batch in train_loader:
 #     prediction = model(batch)
 #     break
-#
