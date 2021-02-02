@@ -73,8 +73,13 @@ def initialize_datasets(args, datadir='../../data', num_pts=None):
 
     return args, torch_datasets
 
+# data_to_loader_1 returns the following for batch_size=2:
+# Batch(Nobj=[2], Pmu=[400, 4], atom_mask=[400], edge_mask=[400, 200], is_signal=[2], jet_pt=[2], label=[400], mass=[400], truth_Pmu=[8])
 
-def data_to_loader(args, torch_datasets):
+# data_to_loader_2 returns the following for batch_size=2:
+# Batch(Nobj=[2, 1], Pmu=[2, 200, 4], atom_mask=[2, 200], edge_mask=[2, 200, 200], is_signal=[2, 1], jet_pt=[2, 1], label=[2, 200], mass=[2, 200], truth_Pmu=[2, 4])
+
+def data_to_loader_1(args, torch_datasets):
 
     # use collate_fn to construct some: atom_mask and edge_mask
     data_train = DataLoader(torch_datasets['train'], 1, pin_memory=True, shuffle=True)
@@ -195,25 +200,154 @@ def data_to_loader(args, torch_datasets):
 
     return train_loader, test_loader, valid_loader
 
+
+def data_to_loader_2(args, torch_datasets):
+
+    # use collate_fn to construct some: atom_mask and edge_mask
+    data_train = DataLoader(torch_datasets['train'], 1, pin_memory=True, shuffle=True)
+    data_train.collate_fn = collate_fn
+    data_test = DataListLoader(torch_datasets['test'], 1, pin_memory=True, shuffle=True)
+    data_test.collate_fn = collate_fn
+    data_valid = DataListLoader(torch_datasets['valid'], 1, pin_memory=True, shuffle=True)
+    data_valid.collate_fn = collate_fn
+
+    # initialize some values to start constructing the Data objects
+    d=[]
+    batch_data_train = []
+    batch_data_test = []
+    batch_data_valid = []
+    Nobj=[]
+    Pmu=[]
+    is_signal=[]
+    jet_pt=[]
+    label=[]
+    mass=[]
+    truth_Pmu=[]
+    atom_mask=[]
+    edge_mask=[]
+
+    # Casting the train_dataset as a list of pytorch Data objects
+    for i,data in enumerate(data_train):
+        Nobj.append(data['Nobj'].reshape(1,1).clone().detach())
+        Pmu.append(data['Pmu'].clone().detach())
+        is_signal.append(data['is_signal'].reshape(1,1).clone().detach())
+        jet_pt.append(data['jet_pt'].reshape(1,1).clone().detach())
+        label.append(data['label'].clone().detach())
+        mass.append(data['mass'].clone().detach())
+        truth_Pmu.append(data['truth_Pmu'].clone().detach())
+        atom_mask.append(data['atom_mask'].clone().detach())
+        edge_mask.append(data['edge_mask'].clone().detach())
+
+        d = Data(
+            Nobj=Nobj[i],
+            Pmu=Pmu[i],
+            is_signal=is_signal[i],
+            jet_pt=jet_pt[i],
+            label=label[i],
+            mass=mass[i],
+            truth_Pmu=truth_Pmu[i],
+            atom_mask=atom_mask[i],
+            edge_mask=edge_mask[i]
+        )
+
+        batch_data_train.append([d])
+
+    # Casting the test_dataset as a list of pytorch Data objects
+    for i,data in enumerate(data_test):
+        Nobj.append(data['Nobj'].reshape(1,1).clone().detach())
+        Pmu.append(data['Pmu'].clone().detach())
+        is_signal.append(data['is_signal'].reshape(1,1).clone().detach())
+        jet_pt.append(data['jet_pt'].reshape(1,1).clone().detach())
+        label.append(data['label'].clone().detach())
+        mass.append(data['mass'].clone().detach())
+        truth_Pmu.append(data['truth_Pmu'].clone().detach())
+        atom_mask.append(data['atom_mask'].clone().detach())
+        edge_mask.append(data['edge_mask'].clone().detach())
+
+        d = Data(
+            Nobj=Nobj[i],
+            Pmu=Pmu[i],
+            is_signal=is_signal[i],
+            jet_pt=jet_pt[i],
+            label=label[i],
+            mass=mass[i],
+            truth_Pmu=truth_Pmu[i],
+            atom_mask=atom_mask[i],
+            edge_mask=edge_mask[i]
+        )
+
+        batch_data_test.append([d])
+
+    # Casting the valid_dataset as a list of pytorch Data objects
+    for i,data in enumerate(data_valid):
+        Nobj.append(data['Nobj'].reshape(1,1).clone().detach())
+        Pmu.append(data['Pmu'].clone().detach())
+        is_signal.append(data['is_signal'].reshape(1,1).clone().detach())
+        jet_pt.append(data['jet_pt'].reshape(1,1).clone().detach())
+        label.append(data['label'].clone().detach())
+        mass.append(data['mass'].clone().detach())
+        truth_Pmu.append(data['truth_Pmu'].clone().detach())
+        atom_mask.append(data['atom_mask'].clone().detach())
+        edge_mask.append(data['edge_mask'].clone().detach())
+
+        d = Data(
+            Nobj=Nobj[i],
+            Pmu=Pmu[i],
+            is_signal=is_signal[i],
+            jet_pt=jet_pt[i],
+            label=label[i],
+            mass=mass[i],
+            truth_Pmu=truth_Pmu[i],
+            atom_mask=atom_mask[i],
+            edge_mask=edge_mask[i]
+        )
+
+        batch_data_valid.append([d])
+
+    # defining a DataListLoader to iterate over the data during training
+    train_dataset = torch.utils.data.Subset(batch_data_train, np.arange(start=0, stop=args.num_train))
+    test_dataset = torch.utils.data.Subset(batch_data_test, np.arange(start=0, stop=args.num_test))
+    valid_dataset = torch.utils.data.Subset(batch_data_valid, np.arange(start=0, stop=args.num_valid))
+
+    def collate(items):
+        l = sum(items, [])
+        return Batch.from_data_list(l)
+
+    train_loader = DataListLoader(train_dataset, args.batch_size, pin_memory=True, shuffle=True)
+    train_loader.collate_fn = collate
+    test_loader = DataListLoader(test_dataset, args.batch_size, pin_memory=True, shuffle=True)
+    test_loader.collate_fn = collate
+    valid_loader = DataListLoader(valid_dataset, args.batch_size, pin_memory=True, shuffle=True)
+    valid_loader.collate_fn = collate
+
+    return train_loader, test_loader, valid_loader
+
+
+
 #-----------------------------------------------------------------------------------------------------
-# # test the data loader to get familiar with the data that we feed to the model:
-# class objectview(object):
-#     def __init__(self, d):
-#         self.__dict__ = d
-#
-# args = objectview({'num_epoch': 6, 'batch_size': 1, 'num_train': 1, 'num_test': 1, 'num_valid': 1, 'scale':1, 'nobj':None,
-#                     'shuffle':False, 'add_beams':False, 'beam_mass':1, 'num_wrokers': 0})
-#
-# args, torch_datasets = initialize_datasets(args, datadir='../../data', num_pts=None)
-#
-# train_loader, test_loader, valid_loader = data_to_loader(args, torch_datasets)
-#
-# next(iter(train_loader))
-# # Batch(Nobj=[1], Pmu=[200, 4], atom_mask=[200], edge_mask=[200, 200], is_signal=[1], jet_pt=[1], label=[200], mass=[200], truth_Pmu=[4])
-# # Nobj: length=1 signifies 1 jet.. the element stored in Nobj is the # of actual tracks (ranges from 1 to 200)
-# # Pmu: p4 of each track (capped at 200)
-# # jet_pt: total jet momentum
-# # mass: mass of each track
-# # truth_Pmu: p4 of jet
-# # is_signal: binary (0 or 1)
-# # label: 1 for actual track, 0 for zero-padded track
+# test the data loader to get familiar with the data that we feed to the model:
+class objectview(object):
+    def __init__(self, d):
+        self.__dict__ = d
+
+args = objectview({'num_epoch': 6, 'batch_size': 2, 'num_train': 4, 'num_test': 1, 'num_valid': 1, 'scale':1, 'nobj':None,
+                    'shuffle':False, 'add_beams':False, 'beam_mass':1, 'num_wrokers': 0})
+
+args, torch_datasets = initialize_datasets(args, datadir='../../data', num_pts=None)
+
+train_loader, test_loader, valid_loader = data_to_loader_1(args, torch_datasets)
+
+next(iter(train_loader))
+# Batch(Nobj=[1], Pmu=[200, 4], atom_mask=[200], edge_mask=[200, 200], is_signal=[1], jet_pt=[1], label=[200], mass=[200], truth_Pmu=[4])
+# Nobj: length=1 signifies 1 jet.. the element stored in Nobj is the # of actual tracks (ranges from 1 to 200)
+# Pmu: p4 of each track (capped at 200)
+# jet_pt: total jet momentum
+# mass: mass of each track
+# truth_Pmu: p4 of jet
+# is_signal: binary (0 or 1)
+# label: 1 for actual track, 0 for zero-padded track
+
+
+train_loader, test_loader, valid_loader = data_to_loader_2(args, torch_datasets)
+
+next(iter(train_loader))
