@@ -1,6 +1,6 @@
 # LGN
 
-We attempt to build a Lorentz Group Equivariant Network (LGN); an ML model which respects symmetries in high energy physics, for the task of jet classifciation.
+We attempt to build a Lorentz Group Equivariant Network (LGN); an ML model which respects symmetries in high energy physics, for the task of jet classification.
 
 This work is based on this repository: https://github.com/fizisist/LorentzGroupNetwork
 
