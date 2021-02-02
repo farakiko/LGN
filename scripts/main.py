@@ -1,5 +1,7 @@
+import torch
 import sys
 sys.path.insert(1, 'data_processing/')
+sys.path.insert(1, 'lgn/')
 
 import args
 from args import setup_argparse
@@ -7,13 +9,29 @@ from args import setup_argparse
 from data_processing import make_pytorch_data
 from make_pytorch_data import initialize_datasets
 from make_pytorch_data import data_to_loader
-
+from lgn.models.lgn_toptag import LGNTopTag
 
 def main(args):
 
     args, torch_datasets = initialize_datasets(args, datadir='../data', num_pts=None)
 
     train_loader, test_loader, valid_loader = data_to_loader(args, torch_datasets)
+
+    device = torch.device('cpu')
+
+    if args.dtype == 'double':
+        dtype = torch.double
+    elif args.dtype == 'float':
+        dtype = torch.float
+
+    # # Initialize model
+    # model = LGNTopTag(args.maxdim, args.max_zf, args.num_cg_levels, args.num_channels,
+    #                   args.cutoff_type, args.hard_cut_rad, args.soft_cut_rad, args.soft_cut_width,
+    #                   args.weight_init, args.level_gain, args.num_basis_fn,
+    #                   args.top, args.input, args.num_mpnn_levels, activation=args.activation, pmu_in=args.pmu_in, add_beams=args.add_beams,
+    #                   mlp=args.mlp, mlp_depth=args.mlp_depth, mlp_width=args.mlp_width,
+    #                   scale=1., full_scalars=args.full_scalars,
+    #                   device=device, dtype=dtype)
 
     return train_loader
 
