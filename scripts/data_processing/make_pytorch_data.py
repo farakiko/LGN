@@ -101,15 +101,15 @@ def data_to_loader(args, torch_datasets):
 
     # Casting the train_dataset as a list of pytorch Data objects
     for i,data in enumerate(data_train):
-        Nobj.append(data['Nobj'].clone().detach())
-        Pmu.append(data['Pmu'].clone().detach())
-        is_signal.append(data['is_signal'].clone().detach())
-        jet_pt.append(data['jet_pt'].clone().detach())
-        label.append(data['label'].clone().detach())
-        mass.append(data['mass'].clone().detach())
-        truth_Pmu.append(data['truth_Pmu'].clone().detach())
-        atom_mask.append(data['atom_mask'].clone().detach())
-        edge_mask.append(data['edge_mask'].clone().detach())
+        Nobj.append(data['Nobj'][0].clone().detach())
+        Pmu.append(data['Pmu'][0].clone().detach())
+        is_signal.append(data['is_signal'][0].clone().detach())
+        jet_pt.append(data['jet_pt'][0].clone().detach())
+        label.append(data['label'][0].clone().detach())
+        mass.append(data['mass'][0].clone().detach())
+        truth_Pmu.append(data['truth_Pmu'][0].clone().detach())
+        atom_mask.append(data['atom_mask'][0].clone().detach())
+        edge_mask.append(data['edge_mask'][0].clone().detach())
 
         d = Data(
             Nobj=Nobj[i],
@@ -127,15 +127,15 @@ def data_to_loader(args, torch_datasets):
 
     # Casting the test_dataset as a list of pytorch Data objects
     for i,data in enumerate(data_test):
-        Nobj.append(data['Nobj'].clone().detach())
-        Pmu.append(data['Pmu'].clone().detach())
-        is_signal.append(data['is_signal'].clone().detach())
-        jet_pt.append(data['jet_pt'].clone().detach())
-        label.append(data['label'].clone().detach())
-        mass.append(data['mass'].clone().detach())
-        truth_Pmu.append(data['truth_Pmu'].clone().detach())
-        atom_mask.append(data['atom_mask'].clone().detach())
-        edge_mask.append(data['edge_mask'].clone().detach())
+        Nobj.append(data['Nobj'][0].clone().detach())
+        Pmu.append(data['Pmu'][0].clone().detach())
+        is_signal.append(data['is_signal'][0].clone().detach())
+        jet_pt.append(data['jet_pt'][0].clone().detach())
+        label.append(data['label'][0].clone().detach())
+        mass.append(data['mass'][0].clone().detach())
+        truth_Pmu.append(data['truth_Pmu'][0].clone().detach())
+        atom_mask.append(data['atom_mask'][0].clone().detach())
+        edge_mask.append(data['edge_mask'][0].clone().detach())
 
         d = Data(
             Nobj=Nobj[i],
@@ -153,15 +153,15 @@ def data_to_loader(args, torch_datasets):
 
     # Casting the valid_dataset as a list of pytorch Data objects
     for i,data in enumerate(data_valid):
-        Nobj.append(data['Nobj'].clone().detach())
-        Pmu.append(data['Pmu'].clone().detach())
-        is_signal.append(data['is_signal'].clone().detach())
-        jet_pt.append(data['jet_pt'].clone().detach())
-        label.append(data['label'].clone().detach())
-        mass.append(data['mass'].clone().detach())
-        truth_Pmu.append(data['truth_Pmu'].clone().detach())
-        atom_mask.append(data['atom_mask'].clone().detach())
-        edge_mask.append(data['edge_mask'].clone().detach())
+        Nobj.append(data['Nobj'][0].clone().detach())
+        Pmu.append(data['Pmu'][0].clone().detach())
+        is_signal.append(data['is_signal'][0].clone().detach())
+        jet_pt.append(data['jet_pt'][0].clone().detach())
+        label.append(data['label'][0].clone().detach())
+        mass.append(data['mass'][0].clone().detach())
+        truth_Pmu.append(data['truth_Pmu'][0].clone().detach())
+        atom_mask.append(data['atom_mask'][0].clone().detach())
+        edge_mask.append(data['edge_mask'][0].clone().detach())
 
         d = Data(
             Nobj=Nobj[i],
@@ -195,26 +195,25 @@ def data_to_loader(args, torch_datasets):
 
     return train_loader, test_loader, valid_loader
 
-
 #-----------------------------------------------------------------------------------------------------
-# test the data loader to get familiar with the data that we feed to the model:
-class objectview(object):
-    def __init__(self, d):
-        self.__dict__ = d
-
-args = objectview({'num_epoch': 6, 'batch_size': 2, 'num_train': 4, 'num_test': 1, 'num_valid': 1, 'scale':1, 'nobj':None,
-                    'shuffle':False, 'add_beams':False, 'beam_mass':1, 'num_wrokers': 0})
-
-args, torch_datasets = initialize_datasets(args, datadir='../../data', num_pts=None)
-
-train_loader, test_loader, valid_loader = data_to_loader(args, torch_datasets)
-
-next(iter(train_loader))
-# Batch(Nobj=[1], Pmu=[200, 4], atom_mask=[200], edge_mask=[200, 200], is_signal=[1], jet_pt=[1], label=[200], mass=[200], truth_Pmu=[4])
-# Nobj: # of actual tracks (ranges from 1 to 200)
-# Pmu: p4 of each track
-# jet_pt: total jet momentum
-# mass: mass of each track
-# truth_Pmu: p4 of jet
-# is_signal: binary (0 or 1)
-# label: 1 for actual track, 0 for zero-padded track
+# # test the data loader to get familiar with the data that we feed to the model:
+# class objectview(object):
+#     def __init__(self, d):
+#         self.__dict__ = d
+#
+# args = objectview({'num_epoch': 6, 'batch_size': 1, 'num_train': 1, 'num_test': 1, 'num_valid': 1, 'scale':1, 'nobj':None,
+#                     'shuffle':False, 'add_beams':False, 'beam_mass':1, 'num_wrokers': 0})
+#
+# args, torch_datasets = initialize_datasets(args, datadir='../../data', num_pts=None)
+#
+# train_loader, test_loader, valid_loader = data_to_loader(args, torch_datasets)
+#
+# next(iter(train_loader))
+# # Batch(Nobj=[1], Pmu=[200, 4], atom_mask=[200], edge_mask=[200, 200], is_signal=[1], jet_pt=[1], label=[200], mass=[200], truth_Pmu=[4])
+# # Nobj: length=1 signifies 1 jet.. the element stored in Nobj is the # of actual tracks (ranges from 1 to 200)
+# # Pmu: p4 of each track (capped at 200)
+# # jet_pt: total jet momentum
+# # mass: mass of each track
+# # truth_Pmu: p4 of jet
+# # is_signal: binary (0 or 1)
+# # label: 1 for actual track, 0 for zero-padded track

@@ -199,7 +199,7 @@ class LGNTopTag(CGModule):
         atom_mask = data['atom_mask'].to(device, torch.uint8)
         edge_mask = data['edge_mask'].to(device, torch.uint8)
 
-        scalars = torch.ones_like(atom_ps[:, :, 0]).unsqueeze(-1)
+        scalars = torch.ones_like(atom_ps[:, 0]).unsqueeze(-1)
         scalars = normsq4(atom_ps).abs().sqrt().unsqueeze(-1)
 
         if 'scalars' in data.keys:
@@ -221,52 +221,48 @@ def expand_var_list(var, num_cg_levels):
     return var_list
 
 
-
 #-----------------------------------------------------------
-# testing a forward pass of the model
-
-# (1) contsruct the model
-class objectview(object):
-    def __init__(self, d):
-        self.__dict__ = d
-
-args = objectview({'num_epoch': 6, 'batch_size': 2, 'num_train': 4, 'num_test': 1, 'num_valid': 1, 'scale':1, 'nobj': None,
-                   'shuffle': False, 'add_beams': False, 'beam_mass': 1, 'num_wrokers': 0,
-                   'maxdim': [3], 'max_zf': [1], 'num_cg_levels': 3, 'num_channels': [2, 3, 4, 3],
-                   'weight_init': 'randn', 'level_gain':[1.], 'num_basis_fn':10,
-                   'top': 'linear', 'input': 'linear', 'num_mpnn_levels': 1,
-                   'activation': 'leakyrelu', 'pmu_in': False, 'add_beams': True,
-                   'mlp': True, 'mlp_depth': 3, 'mlp_width': 2, 'full_scalars': False})
-
-model = LGNTopTag(args.maxdim, args.max_zf, args.num_cg_levels, args.num_channels,
-                  args.weight_init, args.level_gain, args.num_basis_fn,
-                  args.top, args.input, args.num_mpnn_levels, activation=args.activation, pmu_in=args.pmu_in, add_beams=args.add_beams,
-                  mlp=args.mlp, mlp_depth=args.mlp_depth, mlp_width=args.mlp_width,
-                  scale=1., full_scalars=args.full_scalars,
-                  device=torch.device('cpu'), dtype=torch.float)
-
-model
-
-
-# (2) get a data sample
-sys.path.insert(1, '../../data_processing')
-from make_pytorch_data import initialize_datasets
-from make_pytorch_data import data_to_loader
-
-
-args, torch_datasets = initialize_datasets(args, datadir='../../../data', num_pts=None)
-
-train_loader, test_loader, valid_loader = data_to_loader(args, torch_datasets)
-
-next(iter(train_loader))
-
-
-
-
-
-
-
-# (3) pass it to the model to make a prediction
-for batch in train_loader:
-    prediction = model(batch)
-    break
+# # testing a forward pass of the model
+#
+# # (1) contsruct the model
+# class objectview(object):
+#     def __init__(self, d):
+#         self.__dict__ = d
+#
+# args = objectview({'num_epoch': 6, 'batch_size': 2, 'num_train': 4, 'num_test': 1, 'num_valid': 1, 'scale':1, 'nobj': None,
+#                    'shuffle': False, 'add_beams': False, 'beam_mass': 1, 'num_wrokers': 0,
+#                    'maxdim': [3], 'max_zf': [1], 'num_cg_levels': 3, 'num_channels': [2, 3, 4, 3],
+#                    'weight_init': 'randn', 'level_gain':[1.], 'num_basis_fn':10,
+#                    'top': 'linear', 'input': 'linear', 'num_mpnn_levels': 1,
+#                    'activation': 'leakyrelu', 'pmu_in': False, 'add_beams': True,
+#                    'mlp': True, 'mlp_depth': 3, 'mlp_width': 2, 'full_scalars': False})
+#
+# model = LGNTopTag(args.maxdim, args.max_zf, args.num_cg_levels, args.num_channels,
+#                   args.weight_init, args.level_gain, args.num_basis_fn,
+#                   args.top, args.input, args.num_mpnn_levels, activation=args.activation, pmu_in=args.pmu_in, add_beams=args.add_beams,
+#                   mlp=args.mlp, mlp_depth=args.mlp_depth, mlp_width=args.mlp_width,
+#                   scale=1., full_scalars=args.full_scalars,
+#                   device=torch.device('cpu'), dtype=torch.float)
+#
+# model
+#
+# # (2) get a data sample
+# sys.path.insert(1, '../../data_processing')
+# from make_pytorch_data import initialize_datasets
+# from make_pytorch_data import data_to_loader
+#
+# args, torch_datasets = initialize_datasets(args, datadir='../../../data', num_pts=None)
+#
+# train_loader, test_loader, valid_loader = data_to_loader(args, torch_datasets)
+#
+# next(iter(train_loader))
+#
+# for batch in train_loader:
+#     print(batch.Nobj)
+#
+#
+# # (3) pass it to the model to make a prediction
+# for batch in train_loader:
+#     prediction = model(batch)
+#     break
+#
