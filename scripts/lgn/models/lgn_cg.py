@@ -8,7 +8,6 @@ class LGNCG(CGModule):
     def __init__(self, maxdim, max_zf, tau_in_atom, tau_pos,
                  num_cg_levels, num_channels,
                  level_gain, weight_init,
-                 cutoff_type, hard_cut_rad, soft_cut_rad, soft_cut_width,
                  mlp=True, mlp_depth=None, mlp_width=None, activation='leakyrelu',
                  device=None, dtype=None, cg_dict=None):
         super().__init__(device=device, dtype=dtype, cg_dict=cg_dict)

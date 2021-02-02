@@ -1,8 +1,7 @@
 import torch
-
 import logging
 import sys
-sys.path.insert(1, '../../')
+sys.path.insert(1, '../..')
 
 from lgn.cg_lib import CGModule, ZonalFunctionsRel, ZonalFunctions, normsq4
 from lgn.g_lib import GTau
@@ -41,7 +40,6 @@ class LGNTopTag(CGModule):
         Clebsch-gordan dictionary object.
     """
     def __init__(self, maxdim, max_zf, num_cg_levels, num_channels,
-                 cutoff_type, hard_cut_rad, soft_cut_rad, soft_cut_width,
                  weight_init, level_gain, num_basis_fn,
                  top, input, num_mpnn_layers, activation='leakyrelu', pmu_in=False, add_beams=True,
                  scale=1, full_scalars=False, mlp=True, mlp_depth=None, mlp_width=None,
@@ -50,17 +48,10 @@ class LGNTopTag(CGModule):
         logging.info('Initializing network!')
         level_gain = expand_var_list(level_gain, num_cg_levels)
 
-        hard_cut_rad = expand_var_list(hard_cut_rad, num_cg_levels)
-        soft_cut_rad = expand_var_list(soft_cut_rad, num_cg_levels)
-        soft_cut_width = expand_var_list(soft_cut_width, num_cg_levels)
-
         maxdim = expand_var_list(maxdim, num_cg_levels)
         max_zf = expand_var_list(max_zf, num_cg_levels)
         num_channels = expand_var_list(num_channels, num_cg_levels + 1)
 
-        logging.info('hard_cut_rad: {}'.format(hard_cut_rad))
-        logging.info('soft_cut_rad: {}'.format(soft_cut_rad))
-        logging.info('soft_cut_width: {}'.format(soft_cut_width))
         logging.info('maxdim: {}'.format(maxdim))
         logging.info('max_zf: {}'.format(max_zf))
         logging.info('num_channels: {}'.format(num_channels))
@@ -107,8 +98,7 @@ class LGNTopTag(CGModule):
 
         self.lgn_cg = LGNCG(maxdim, max_zf, tau_in_atom,
                                         tau_pos, num_cg_levels, num_channels,
-                                        level_gain, weight_init, cutoff_type,
-                                        hard_cut_rad, soft_cut_rad, soft_cut_width,
+                                        level_gain, weight_init,
                                         mlp=mlp, mlp_depth=mlp_depth, mlp_width=mlp_width,
                                         activation=activation, device=self.device, dtype=self.dtype, cg_dict=self.cg_dict)
 
@@ -212,7 +202,7 @@ class LGNTopTag(CGModule):
         scalars = torch.ones_like(atom_ps[:, :, 0]).unsqueeze(-1)
         scalars = normsq4(atom_ps).abs().sqrt().unsqueeze(-1)
 
-        if 'scalars' in data.keys():
+        if 'scalars' in data.keys:
             scalars = torch.cat([scalars, data['scalars'].to(device, dtype)], dim=-1)
 
         if not cg_levels:
@@ -229,3 +219,54 @@ def expand_var_list(var, num_cg_levels):
     else:
         raise ValueError('Incorrect type {}'.format(type(var)))
     return var_list
+
+
+
+#-----------------------------------------------------------
+# testing a forward pass of the model
+
+# (1) contsruct the model
+class objectview(object):
+    def __init__(self, d):
+        self.__dict__ = d
+
+args = objectview({'num_epoch': 6, 'batch_size': 2, 'num_train': 4, 'num_test': 1, 'num_valid': 1, 'scale':1, 'nobj': None,
+                   'shuffle': False, 'add_beams': False, 'beam_mass': 1, 'num_wrokers': 0,
+                   'maxdim': [3], 'max_zf': [1], 'num_cg_levels': 3, 'num_channels': [2, 3, 4, 3],
+                   'weight_init': 'randn', 'level_gain':[1.], 'num_basis_fn':10,
+                   'top': 'linear', 'input': 'linear', 'num_mpnn_levels': 1,
+                   'activation': 'leakyrelu', 'pmu_in': False, 'add_beams': True,
+                   'mlp': True, 'mlp_depth': 3, 'mlp_width': 2, 'full_scalars': False})
+
+model = LGNTopTag(args.maxdim, args.max_zf, args.num_cg_levels, args.num_channels,
+                  args.weight_init, args.level_gain, args.num_basis_fn,
+                  args.top, args.input, args.num_mpnn_levels, activation=args.activation, pmu_in=args.pmu_in, add_beams=args.add_beams,
+                  mlp=args.mlp, mlp_depth=args.mlp_depth, mlp_width=args.mlp_width,
+                  scale=1., full_scalars=args.full_scalars,
+                  device=torch.device('cpu'), dtype=torch.float)
+
+model
+
+
+# (2) get a data sample
+sys.path.insert(1, '../../data_processing')
+from make_pytorch_data import initialize_datasets
+from make_pytorch_data import data_to_loader
+
+
+args, torch_datasets = initialize_datasets(args, datadir='../../../data', num_pts=None)
+
+train_loader, test_loader, valid_loader = data_to_loader(args, torch_datasets)
+
+next(iter(train_loader))
+
+
+
+
+
+
+
+# (3) pass it to the model to make a prediction
+for batch in train_loader:
+    prediction = model(batch)
+    break

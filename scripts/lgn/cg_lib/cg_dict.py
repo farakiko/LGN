@@ -100,7 +100,7 @@ class CGDict():
 
         # Otherwise, update the CG coefficients.
         cg_dict_new = _gen_cg_dict(new_maxdim, existing_keys=self._cg_dict.keys())
-        cg_dict_new = {key: {irrep: cg_tens.view(-1, cg_tens.shape[-1]) for irrep, cg_tens in val.items()} for key, val in cg_dict_new.items()}
+        cg_dict_new = {key: {irrep: cg_tens.reshape(-1, cg_tens.shape[-1]) for irrep, cg_tens in val.items()} for key, val in cg_dict_new.items()}
         if self.transpose:
             cg_dict_new = {key: {irrep: cg_mat.permute(1, 0) for irrep, cg_mat in val.items()} for key, val in cg_dict_new.items()}
 
@@ -207,7 +207,7 @@ def memoize(func):  #create a cached version of any function for fast repeated u
 
 
 def clebschSU2mat(j1, j2, j3):
-    
+
     mat=np.zeros((int(2 * j1 + 1), int(2 * j2 + 1), int(2 * j3 + 1)))
     if int(2 * j3) in range(int(2 * abs(j1 - j2)), int(2 * (j1 + j2)) + 1, 2):
         for m1 in (x / 2 for x in range(-int(2 * j1), int(2 * j1) + 1, 2)):
