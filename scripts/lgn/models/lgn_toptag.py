@@ -41,7 +41,7 @@ class LGNTopTag(CGModule):
     """
     def __init__(self, maxdim, max_zf, num_cg_levels, num_channels,
                  weight_init, level_gain, num_basis_fn,
-                 top, input, num_mpnn_layers, activation='leakyrelu', pmu_in=False, add_beams=True,
+                 top, input, num_mpnn_layers, activation='leakyrelu', pmu_in=False, add_beams=False,
                  scale=1, full_scalars=False, mlp=True, mlp_depth=None, mlp_width=None,
                  device=torch.device('cpu'), dtype=None, cg_dict=None):
 
@@ -234,7 +234,7 @@ def expand_var_list(var, num_cg_levels):
 #                    'maxdim': [3], 'max_zf': [1], 'num_cg_levels': 3, 'num_channels': [2, 3, 4, 3],
 #                    'weight_init': 'randn', 'level_gain':[1.], 'num_basis_fn':10,
 #                    'top': 'linear', 'input': 'linear', 'num_mpnn_levels': 1,
-#                    'activation': 'leakyrelu', 'pmu_in': False, 'add_beams': True,
+#                    'activation': 'leakyrelu', 'pmu_in': False,
 #                    'mlp': True, 'mlp_depth': 3, 'mlp_width': 2, 'full_scalars': False})
 #
 # model = LGNTopTag(args.maxdim, args.max_zf, args.num_cg_levels, args.num_channels,
@@ -257,6 +257,7 @@ def expand_var_list(var, num_cg_levels):
 #
 # next(iter(train_loader))
 #
+#
 # for batch in train_loader:
 #     print(batch.Nobj)
 #
@@ -265,3 +266,6 @@ def expand_var_list(var, num_cg_levels):
 # for batch in train_loader:
 #     prediction = model(batch)
 #     break
+#
+# prediction
+# batch.is_signal
