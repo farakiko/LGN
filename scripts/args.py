@@ -7,7 +7,7 @@ def setup_argparse():
 
     parser = argparse.ArgumentParser(description='LGN network options')
 
-    parser.add_argument('--num-train', type=int, default=1, metavar='N',
+    parser.add_argument('--num-train', type=int, default=4, metavar='N',
                         help='Number of samples to train on. Set to -1 to use entire dataset. (default: -1)')
     parser.add_argument('--num-valid', type=int, default=1, metavar='N',
                         help='Number of validation samples to use. Set to -1 to use entire dataset. (default: -1)')
@@ -20,7 +20,7 @@ def setup_argparse():
     # Optimizer options
     parser.add_argument('--num-epoch', type=int, default=6, metavar='N',
                         help='number of epochs to train (default: 10)')
-    parser.add_argument('--batch-size', '-bs', type=int, default=1, metavar='N',
+    parser.add_argument('--batch-size', '-bs', type=int, default=3, metavar='N',
                         help='Mini-batch size (default: 10)')
     parser.add_argument('--batch-group-size', '-bgs', type=int, default=1, metavar='N',
                         help='Mini-batch size (default: 10)')
@@ -122,7 +122,7 @@ def setup_argparse():
     parser.add_argument('--nobj', type=int, default=None, metavar='N',
                         help='Max number of particles in each event (selects the first nobj). Set to None to use entire dataset. (default: None)')
 
-    parser.add_argument('--add-beams', action=BoolArg, default=True,
+    parser.add_argument('--add-beams', action=BoolArg, default=False,
                         help='Append two proton beams of the form (m^2,0,0,+-1) to each event')
     parser.add_argument('--beam-mass', type=float, default=1, metavar='N',
                     help='Set mass m of the beams, so that E=sqrt(1 + m^2) (default = 1)')

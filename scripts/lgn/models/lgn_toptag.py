@@ -202,7 +202,7 @@ class LGNTopTag(CGModule):
         scalars = torch.ones_like(atom_ps[:,:, 0]).unsqueeze(-1)
         scalars = normsq4(atom_ps).abs().sqrt().unsqueeze(-1)
 
-        if 'scalars' in data.keys:
+        if 'scalars' in data.keys():
             scalars = torch.cat([scalars, data['scalars'].to(device, dtype)], dim=-1)
 
         if not cg_levels:
@@ -229,8 +229,8 @@ def expand_var_list(var, num_cg_levels):
 #     def __init__(self, d):
 #         self.__dict__ = d
 #
-# args = objectview({'num_epoch': 6, 'batch_size': 2, 'num_train': 4, 'num_test': 1, 'num_valid': 1, 'scale':1, 'nobj': None,
-#                    'shuffle': False, 'add_beams': False, 'beam_mass': 1, 'num_wrokers': 0,
+# args = objectview({'num_epoch': 6, 'batch_size': 2, 'num_train': -1, 'num_test': -1, 'num_valid': -1, 'scale':1, 'nobj': None,
+#                    'shuffle': False, 'add_beams': False, 'beam_mass': 1, 'num_workers': 0,
 #                    'maxdim': [3], 'max_zf': [1], 'num_cg_levels': 3, 'num_channels': [2, 3, 4, 3],
 #                    'weight_init': 'randn', 'level_gain':[1.], 'num_basis_fn':10,
 #                    'top': 'linear', 'input': 'linear', 'num_mpnn_levels': 1,
@@ -244,7 +244,7 @@ def expand_var_list(var, num_cg_levels):
 #                   scale=1., full_scalars=args.full_scalars,
 #                   device=torch.device('cpu'), dtype=torch.float)
 #
-# model
+# print(model)
 #
 # # (2) get a data sample
 # sys.path.insert(1, '../../data_processing')
@@ -255,17 +255,18 @@ def expand_var_list(var, num_cg_levels):
 #
 # train_loader, test_loader, valid_loader = data_to_loader(args, torch_datasets)
 #
-# next(iter(train_loader))
-#
-#
-# for batch in train_loader:
-#     print(batch.Nobj)
-#
-#
 # # (3) pass it to the model to make a prediction
 # for batch in train_loader:
 #     prediction = model(batch)
 #     break
 #
-# prediction
-# batch.is_signal
+# print(prediction)
+# print(batch['is_signal'])
+#
+# print( torch.nn.CrossEntropyLoss()(prediction, batch['is_signal'].long()) )
+#
+## prediction.argmax(axis=1)
+##
+## batch['is_signal'].long()
+## prediction
+## torch.sigmoid(prediction)
