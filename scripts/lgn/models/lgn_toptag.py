@@ -39,8 +39,7 @@ class LGNTopTag(CGModule):
     cg_dict : :class:`CGDict <lgn.cg_lib.CGDict>`
         Clebsch-gordan dictionary object.
     """
-    def __init__(self, maxdim, max_zf, num_cg_levels, num_channels,
-                 weight_init, level_gain, num_basis_fn,
+    def __init__(self, maxdim, max_zf, num_cg_levels, num_channels, weight_init, level_gain, num_basis_fn,
                  top, input, num_mpnn_layers, activation='leakyrelu', pmu_in=False, add_beams=False,
                  scale=1, full_scalars=False, mlp=True, mlp_depth=None, mlp_width=None,
                  device=torch.device('cpu'), dtype=None, cg_dict=None):

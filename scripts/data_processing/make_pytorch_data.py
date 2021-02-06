@@ -7,7 +7,6 @@ sys.path.insert(1, '../')
 
 from torch.utils.data import DataLoader
 from torch.utils.data import ConcatDataset
-from torch_geometric.data import Data, DataLoader, DataListLoader, Batch
 
 from collate import collate_fn
 from jetdatasets import JetDataset
