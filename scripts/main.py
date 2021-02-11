@@ -180,7 +180,16 @@ if __name__ == "__main__":
     with open("args_cache.json", "w") as f:
         json.dump(vars(args), f)
 
-    device = torch.device('cpu')
+    # check if gpu is available
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    print("Num of GPUs:", torch.cuda.device_count())
+
+    if device.type == 'cuda':
+        print("GPU tagger is:", torch.cuda.current_device())
+        print("GPU model:", torch.cuda.get_device_name(0))
+        torch.cuda.empty_cache()
+
+    print('Working on:', device)
 
     if args.dtype == 'double':
         dtype = torch.double
@@ -206,3 +215,18 @@ if __name__ == "__main__":
 
     # start the training loop
     train_loop(args, model, optimizer, outpath)
+
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+
+device
+
+
+
+
+
+#print("GPU tagger is:", torch.cuda.current_device())
+#print("GPU model:", torch.cuda.get_device_name(0))
+
+
+print(device)
