@@ -1,0 +1,16 @@
+name: LGN
+channels:
+    - conda-forge
+    - pytorch
+dependencies:
+    - python
+    - numpy
+    - scipy
+    - scikit-learn
+    - h5py
+    - colorlog
+    - pytorch
+    - tqdm
+    - matplotlib
+    - time
+    - pip

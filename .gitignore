@@ -3,3 +3,8 @@ scripts/data_processing/processed.pkl
 
 scripts/.DS_Store
 .DS_Store
+
+*.pyc
+*.pyo
+
+*/trained_models

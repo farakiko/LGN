@@ -1,4 +1,6 @@
 import torch
+import os
+import os.path as osp
 import sys
 sys.path.insert(1, 'data_processing/')
 sys.path.insert(1, 'lgn/')
@@ -6,11 +8,163 @@ sys.path.insert(1, 'lgn/')
 import args
 from args import setup_argparse
 
-from data_processing import make_pytorch_data
-from make_pytorch_data import initialize_datasets
-from make_pytorch_data import data_to_loader
+from data_processing.make_pytorch_data import initialize_datasets, data_to_loader
 from lgn.models.lgn_toptag import LGNTopTag
 
+import json
+import pickle
+
+from tqdm import tqdm
+import time
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Get a unique directory name for each trained model
+def get_model_fname(dataset, model, n_train, lr):
+    model_name = type(model).__name__
+    model_params = sum(p.numel() for p in model.parameters())
+    import hashlib
+    model_cfghash = hashlib.blake2b(repr(model).encode()).hexdigest()[:10]
+    model_user = os.environ['USER']
+
+    model_fname = '{}_{}__npar_{}__cfg_{}__user_{}__ntrain_{}__lr_{}__{}'.format(
+        model_name,
+        dataset.split("/")[-1],
+        model_params,
+        model_cfghash,
+        model_user,
+        n_train,
+        lr, int(time.time()))
+    return model_fname
+
+# Create the directory to store the weights/epoch for the trained models
+def create_model_folder(args, model):
+    if not osp.isdir(args.outpath):
+        os.makedirs(args.outpath)
+
+    model_fname = get_model_fname('model#', model, args.num_train, args.lr_init)
+    outpath = osp.join(args.outpath, model_fname)
+
+    if osp.isdir(outpath):
+        print("model output {} already exists, please delete it".format(outpath))
+        sys.exit(0)
+    else:
+        os.makedirs(outpath)
+
+    model_kwargs = {'model_name': model_fname, 'learning_rate': args.lr_init}
+
+    with open('{}/model_kwargs.pkl'.format(outpath), 'wb') as f:
+        pickle.dump(model_kwargs, f,  protocol=pickle.HIGHEST_PROTOCOL)
+
+    return outpath
+
+# create the training loop
+@torch.no_grad()
+def test(model, loader):
+    with torch.no_grad():
+        test_pred = train(model, loader, None, None)
+    return test_pred
+
+def train(model, loader, optimizer, lr):
+
+    is_train = (optimizer is not None)
+
+    if is_train:
+        model.train()
+    else:
+        model.eval()
+
+    avg_loss_per_epoch = []
+
+    for i, batch in enumerate(loader):
+        t0 = time.time()
+
+        # for better reading of the code
+        X = batch
+        Y = batch['is_signal']
+
+        # forwardprop
+        preds = model(X)
+
+        # backprop
+        batch_loss = torch.nn.CrossEntropyLoss().cuda()(preds, Y.long())
+        if is_train:
+            optimizer.zero_grad()
+            batch_loss.backward()
+            optimizer.step()
+
+        t1 = time.time()
+
+        if is_train:
+            print('{}/{} train_loss={:.2f} dt={:.1f}s'.format(i+1, len(loader), batch_loss.item(), t1-t0), end='\r', flush=True)
+        else:
+            print('{}/{} valid_loss={:.2f} dt={:.1f}s'.format(i+1, len(loader), batch_loss.item(), t1-t0), end='\r', flush=True)
+
+        avg_loss_per_epoch.append(batch_loss.item())
+
+        i += 1
+
+    avg_loss_per_epoch = sum(avg_loss_per_epoch)/len(avg_loss_per_epoch)
+
+    return avg_loss_per_epoch
+
+
+def train_loop(args, model, optimizer, outpath):
+    t0_initial = time.time()
+
+    losses_train = []
+    losses_valid = []
+
+    best_valid_loss = 99999.9
+    stale_epochs = 0
+
+    print("Training over {} epochs".format(args.num_epoch))
+
+    for epoch in range(args.num_epoch):
+        t0 = time.time()
+
+        if stale_epochs > args.patience:
+            print("breaking due to stale epochs")
+            break
+
+        model.train()
+        train_loss = train(model, train_loader, optimizer, args.lr_init)
+        losses_train.append(train_loss)
+
+        # test generalization of the model
+        model.eval()
+        valid_loss = test(model, valid_loader)
+        losses_valid.append(valid_loss)
+
+        if valid_loss < best_valid_loss:
+            best_val_loss = valid_loss
+            stale_epochs = 0
+        else:
+            stale_epochs += 1
+
+        t1 = time.time()
+
+        epochs_remaining = args.num_epoch - epoch
+        time_per_epoch = (t1 - t0_initial)/(epoch + 1)
+
+        eta = epochs_remaining*time_per_epoch/60
+
+        torch.save(model.state_dict(), "{0}/epoch_{1}_weights.pth".format(outpath, epoch))
+
+        print("epoch={}/{} dt={:.2f}s train_loss={:.5f} valid_loss={:.5f} stale={} eta={:.1f}m".format(
+            epoch, args.num_epoch,
+            t1 - t0, train_loss, valid_loss,
+            stale_epochs, eta))
+
+    fig, ax = plt.subplots()
+    ax.plot(range(len(losses_train)), losses_train, label='train loss')
+    ax.plot(range(len(losses_valid)), losses_valid, label='test loss')
+    ax.set_xlabel('Epochs')
+    ax.set_ylabel('Loss')
+    ax.legend(loc='best')
+    plt.show()
+
+#---------------------------------------------------------------------------------------------
 
 if __name__ == "__main__":
 
@@ -21,13 +175,10 @@ if __name__ == "__main__":
     #     def __init__(self, d):
     #         self.__dict__ = d
     #
-    # args = objectview({'num_epoch': 6, 'batch_size': 3, 'num_train': 4, 'num_test': 1, 'num_valid': 1, 'scale':1, 'nobj': None,
-    #                    'shuffle': False, 'add_beams': False, 'beam_mass': 1, 'num_workers': 0,
-    #                    'maxdim': [3], 'max_zf': [1], 'num_cg_levels': 3, 'num_channels': [2, 3, 4, 3],
-    #                    'weight_init': 'randn', 'level_gain':[1.], 'num_basis_fn':10,
-    #                    'top': 'linear', 'input': 'linear', 'num_mpnn_levels': 1,
-    #                    'activation': 'leakyrelu', 'pmu_in': False,
-    #                    'mlp': True, 'mlp_depth': 3, 'mlp_width': 2, 'full_scalars': False, 'dtype': 'float'})
+    # args = objectview({"num_train": 4, "num_valid": 2, "num_test": 2, "task": "train", "num_epoch": 4, "batch_size": 2, "batch_group_size": 1, "weight_decay": 0, "cutoff_decay": 0, "lr_init": 0.001, "lr_final": 1e-05, "lr_decay": 9999, "lr_decay_type": "cos", "lr_minibatch": True, "sgd_restart": -1, "optim": "amsgrad", "parallel": False, "shuffle": True, "seed": 1, "alpha": 50, "save": True, "load": False, "test": True, "log_level": "info", "textlog": True, "predict": True, "quiet": True, "prefix": "nosave", "loadfile": "", "checkfile": "", "bestfile": "", "logfile": "", "predictfile": "", "workdir": "./", "logdir": "log/", "modeldir": "model/", "predictdir": "predict/", "datadir": "data/", "dataset": "jet", "target": "is_signal", "add_beams": False, "beam_mass": 1, "force_download": False, "cuda": True, "dtype": "float", "num_workers": 0, "pmu_in": False, "num_cg_levels": 3, "mlp_depth": 3, "mlp_width": 2, "maxdim": [3], "max_zf": [1], "num_channels": [2, 3, 4, 3], "level_gain": [1.0], "cutoff_type": ["learn"], "num_basis_fn": 10, "scale": 0.005, "full_scalars": False, "mlp": True, "activation": "leakyrelu", "weight_init": "randn", "input": "linear", "num_mpnn_levels": 1, "top": "linear", "gaussian_mask": False, 'patience': 100, 'outpath': 'trained_models/'})
+
+    with open("args_cache.json", "w") as f:
+        json.dump(vars(args), f)
 
     device = torch.device('cpu')
 
@@ -47,12 +198,11 @@ if __name__ == "__main__":
                       scale=1., full_scalars=args.full_scalars, mlp=args.mlp, mlp_depth=args.mlp_depth, mlp_width=args.mlp_width,
                       device=device, dtype=dtype)
 
-    # make a forward pass
-    for batch in train_loader:
-        pred = model(batch)
-        break
+    # get directory name for the model to train
+    outpath = create_model_folder(args, model)
 
-    # print model prediction (which is a one-hot encoded 2D vector corresponding to the 2 classes)
-    # note: batch_size=3, that's why pred.shape=(3,2)
-    print('A quick prediction of the class of 1 batch containing 3 jets is:')
-    print(pred)
+    # define an optimizer
+    optimizer = torch.optim.Adam(model.parameters(), args.lr_init)
+
+    # start the training loop
+    train_loop(args, model, optimizer, outpath)

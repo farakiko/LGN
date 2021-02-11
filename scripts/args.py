@@ -17,6 +17,11 @@ def setup_argparse():
     parser.add_argument('--task', type=str, default='train', metavar='str',
                         help='Train or evaluate model. (train | eval)')
 
+    # farouk added those:
+    parser.add_argument("--patience", type=int, default=100, help="patience before early stopping")
+    parser.add_argument("--outpath", type=str, default = 'trained_models/', help="Output folder")
+
+
     # Optimizer options
     parser.add_argument('--num-epoch', type=int, default=6, metavar='N',
                         help='number of epochs to train (default: 10)')
