@@ -68,7 +68,7 @@ def test(model, loader):
 
 def train(model, loader, optimizer, lr):
 
-    is_train = (optimizer is not None)
+    is_train = not (optimizer is None)
 
     if is_train:
         model.train()
@@ -88,7 +88,9 @@ def train(model, loader, optimizer, lr):
         preds = model(X)
 
         # backprop
-        batch_loss = (nn.CrossEntropyLoss().cuda() if torch.cuda.is_available() else nn.CrossEntropyLoss())(preds, Y.long())
+        loss = nn.CrossEntropyLoss()
+        batch_loss = loss(preds, Y.long())
+        #batch_loss = (nn.CrossEntropyLoss().cuda() if torch.cuda.is_available() else nn.CrossEntropyLoss())(preds, Y.long())
         if is_train:
             optimizer.zero_grad()
             batch_loss.backward()
@@ -97,9 +99,9 @@ def train(model, loader, optimizer, lr):
         t1 = time.time()
 
         if is_train:
-            print('{}/{} train_loss={:.2f} dt={:.1f}s'.format(i+1, len(loader), batch_loss.item(), t1-t0), end='\r', flush=True)
+            print('batch={}/{} train_loss={:.2f} dt={:.1f}s'.format(i+1, len(loader), batch_loss.item(), t1-t0), end='\r', flush=True)
         else:
-            print('{}/{} valid_loss={:.2f} dt={:.1f}s'.format(i+1, len(loader), batch_loss.item(), t1-t0), end='\r', flush=True)
+            print('batch={}/{} valid_loss={:.2f} dt={:.1f}s'.format(i+1, len(loader), batch_loss.item(), t1-t0), end='\r', flush=True)
 
         avg_loss_per_epoch.append(batch_loss.item())
 
@@ -153,7 +155,7 @@ def train_loop(args, model, optimizer, outpath):
         torch.save(model.state_dict(), "{0}/epoch_{1}_weights.pth".format(outpath, epoch))
 
         print("epoch={}/{} dt={:.2f}s train_loss={:.5f} valid_loss={:.5f} stale={} eta={:.1f}m".format(
-            epoch, args.num_epoch,
+            epoch+1, args.num_epoch,
             t1 - t0, train_loss, valid_loss,
             stale_epochs, eta))
 
@@ -163,7 +165,7 @@ def train_loop(args, model, optimizer, outpath):
     ax.set_xlabel('Epochs')
     ax.set_ylabel('Loss')
     ax.legend(loc='best')
-    plt.show()
+    plt.savefig(outpath + '/loss.png')
 
 #---------------------------------------------------------------------------------------------
 
@@ -207,7 +209,15 @@ if __name__ == "__main__":
     model = LGNTopTag(maxdim=args.maxdim, max_zf=args.max_zf, num_cg_levels=args.num_cg_levels, num_channels=args.num_channels, weight_init=args.weight_init, level_gain=args.level_gain, num_basis_fn=args.num_basis_fn,
                       top=args.top, input=args.input, num_mpnn_layers=args.num_mpnn_levels, activation=args.activation, pmu_in=args.pmu_in, add_beams=args.add_beams,
                       scale=1., full_scalars=args.full_scalars, mlp=args.mlp, mlp_depth=args.mlp_depth, mlp_width=args.mlp_width,
-                      device=device, dtype=dtype, )
+                      device=device, dtype=dtype)
+
+    if (next(model.parameters()).is_cuda):
+        print('model is indeed training on gpu..')
+    else:
+        print('model is not training on gpu..')
+
+    print('batches are on:', next(iter(train_loader))['Nobj'].device)
+
 
     if args.train:
         # get directory name for the model to train
