@@ -82,7 +82,7 @@ def train(model, loader, optimizer, lr):
 
         # for better reading of the code
         X = batch
-        Y = batch['is_signal']
+        Y = batch['is_signal'].to(device)
 
         # forwardprop
         preds = model(X)
