@@ -183,8 +183,7 @@ if __name__ == "__main__":
         json.dump(vars(args), f)
 
     # check if gpu is available
-    #device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    device = torch.device("cpu")
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print("Num of GPUs:", torch.cuda.device_count())
 
     if device.type == 'cuda':
