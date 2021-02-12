@@ -7,11 +7,11 @@ def setup_argparse():
 
     parser = argparse.ArgumentParser(description='LGN network options')
 
-    parser.add_argument('--num-train', type=int, default=64, metavar='N',
+    parser.add_argument('--num-train', type=int, default=4000, metavar='N',
                         help='Number of samples to train on. Set to -1 to use entire dataset. (default: -1)')
-    parser.add_argument('--num-valid', type=int, default=64, metavar='N',
+    parser.add_argument('--num-valid', type=int, default=2000, metavar='N',
                         help='Number of validation samples to use. Set to -1 to use entire dataset. (default: -1)')
-    parser.add_argument('--num-test', type=int, default=64, metavar='N',
+    parser.add_argument('--num-test', type=int, default=2000, metavar='N',
                         help='Number of test samples to use. Set to -1 to use entire dataset. (default: -1)')
 
     parser.add_argument('--task', type=str, default='train', metavar='str',
@@ -28,7 +28,7 @@ def setup_argparse():
     # Optimizer options
     parser.add_argument('--num-epoch', type=int, default=4, metavar='N',
                         help='number of epochs to train (default: 10)')
-    parser.add_argument('--batch-size', '-bs', type=int, default=16, metavar='N',
+    parser.add_argument('--batch-size', '-bs', type=int, default=32, metavar='N',
                         help='Mini-batch size (default: 10)')
     parser.add_argument('--batch-group-size', '-bgs', type=int, default=1, metavar='N',
                         help='Mini-batch size (default: 10)')

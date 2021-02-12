@@ -216,9 +216,6 @@ if __name__ == "__main__":
     else:
         print('model is not training on gpu..')
 
-    print('batches are on:', next(iter(train_loader))['Nobj'].device)
-
-
     if args.train:
         # get directory name for the model to train
         outpath = create_model_folder(args, model)
