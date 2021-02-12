@@ -87,7 +87,7 @@ def train(model, loader, optimizer, lr):
         preds = model(X)
 
         # backprop
-        batch_loss = torch.nn.CrossEntropyLoss().cuda()(preds, Y.long())
+        batch_loss = (nn.CrossEntropyLoss().cuda() if torch.cuda.is_available() else nn.CrossEntropyLoss())(preds, Y.long())
         if is_train:
             optimizer.zero_grad()
             batch_loss.backward()
@@ -175,13 +175,15 @@ if __name__ == "__main__":
     #     def __init__(self, d):
     #         self.__dict__ = d
     #
-    # args = objectview({"num_train": 4, "num_valid": 2, "num_test": 2, "task": "train", "num_epoch": 4, "batch_size": 2, "batch_group_size": 1, "weight_decay": 0, "cutoff_decay": 0, "lr_init": 0.001, "lr_final": 1e-05, "lr_decay": 9999, "lr_decay_type": "cos", "lr_minibatch": True, "sgd_restart": -1, "optim": "amsgrad", "parallel": False, "shuffle": True, "seed": 1, "alpha": 50, "save": True, "load": False, "test": True, "log_level": "info", "textlog": True, "predict": True, "quiet": True, "prefix": "nosave", "loadfile": "", "checkfile": "", "bestfile": "", "logfile": "", "predictfile": "", "workdir": "./", "logdir": "log/", "modeldir": "model/", "predictdir": "predict/", "datadir": "data/", "dataset": "jet", "target": "is_signal", "add_beams": False, "beam_mass": 1, "force_download": False, "cuda": True, "dtype": "float", "num_workers": 0, "pmu_in": False, "num_cg_levels": 3, "mlp_depth": 3, "mlp_width": 2, "maxdim": [3], "max_zf": [1], "num_channels": [2, 3, 4, 3], "level_gain": [1.0], "cutoff_type": ["learn"], "num_basis_fn": 10, "scale": 0.005, "full_scalars": False, "mlp": True, "activation": "leakyrelu", "weight_init": "randn", "input": "linear", "num_mpnn_levels": 1, "top": "linear", "gaussian_mask": False, 'patience': 100, 'outpath': 'trained_models/'})
+    # args = objectview({"num_train": 4, "num_valid": 2, "num_test": 2, "task": "train", "num_epoch": 4, "batch_size": 2, "batch_group_size": 1, "weight_decay": 0, "cutoff_decay": 0, "lr_init": 0.001, "lr_final": 1e-05, "lr_decay": 9999, "lr_decay_type": "cos", "lr_minibatch": True, "sgd_restart": -1, "optim": "amsgrad", "parallel": False, "shuffle": True, "seed": 1, "alpha": 50, "save": True, "test": True, "log_level": "info", "textlog": True, "predict": True, "quiet": True, "prefix": "nosave", "loadfile": "", "checkfile": "", "bestfile": "", "logfile": "", "predictfile": "", "workdir": "./", "logdir": "log/", "modeldir": "model/", "predictdir": "predict/", "datadir": "data/", "dataset": "jet", "target": "is_signal", "add_beams": False, "beam_mass": 1, "force_download": False, "cuda": True, "dtype": "float", "num_workers": 0, "pmu_in": False, "num_cg_levels": 3, "mlp_depth": 3, "mlp_width": 2, "maxdim": [3], "max_zf": [1], "num_channels": [2, 3, 4, 3], "level_gain": [1.0], "cutoff_type": ["learn"], "num_basis_fn": 10, "scale": 0.005, "full_scalars": False, "mlp": True, "activation": "leakyrelu", "weight_init": "randn", "input": "linear", "num_mpnn_levels": 1, "top": "linear", "gaussian_mask": False,
+    # 'patience': 100, 'outpath': 'trained_models/', 'train': False, 'load':True})
 
     with open("args_cache.json", "w") as f:
         json.dump(vars(args), f)
 
     # check if gpu is available
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    #device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    device = "cpu"
     print("Num of GPUs:", torch.cuda.device_count())
 
     if device.type == 'cuda':
@@ -205,28 +207,18 @@ if __name__ == "__main__":
     model = LGNTopTag(maxdim=args.maxdim, max_zf=args.max_zf, num_cg_levels=args.num_cg_levels, num_channels=args.num_channels, weight_init=args.weight_init, level_gain=args.level_gain, num_basis_fn=args.num_basis_fn,
                       top=args.top, input=args.input, num_mpnn_layers=args.num_mpnn_levels, activation=args.activation, pmu_in=args.pmu_in, add_beams=args.add_beams,
                       scale=1., full_scalars=args.full_scalars, mlp=args.mlp, mlp_depth=args.mlp_depth, mlp_width=args.mlp_width,
-                      device=device, dtype=dtype)
+                      device=device, dtype=dtype, )
 
-    # get directory name for the model to train
-    outpath = create_model_folder(args, model)
+    if args.train:
+        # get directory name for the model to train
+        outpath = create_model_folder(args, model)
 
-    # define an optimizer
-    optimizer = torch.optim.Adam(model.parameters(), args.lr_init)
+        # define an optimizer
+        optimizer = torch.optim.Adam(model.parameters(), args.lr_init)
 
-    # start the training loop
-    train_loop(args, model, optimizer, outpath)
+        # start the training loop
+        train_loop(args, model, optimizer, outpath)
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
-
-device
-
-
-
-
-
-#print("GPU tagger is:", torch.cuda.current_device())
-#print("GPU model:", torch.cuda.get_device_name(0))
-
-
-print(device)
+    if args.load:
+        PATH = args.outpath + '/LGNTopTag_model#__npar_4642__cfg_1250e9bc04__user_fmokhtar__ntrain_4000__lr_0.001__1613047688/epoch_0_weights.pth'
+        model.load_state_dict(torch.load(PATH))

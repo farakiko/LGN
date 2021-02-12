@@ -20,6 +20,9 @@ def setup_argparse():
     # farouk added those:
     parser.add_argument("--patience", type=int, default=100, help="patience before early stopping")
     parser.add_argument("--outpath", type=str, default = 'trained_models/', help="Output folder")
+    parser.add_argument("--train", action=BoolArg, default=True, help="Start training a model")
+    parser.add_argument("--load", action=BoolArg, default=False, help="Load a pre-trained model")
+    parser.add_argument("--load-path", type=str, default='trained_models/LGNTopTag_model#__npar_4642__cfg_1250e9bc04__user_fmokhtar__ntrain_4000__lr_0.001__1613047688/epoch_0_weights.pth', help="Path to the weights of the model to be loaded")
 
 
     # Optimizer options
@@ -63,8 +66,8 @@ def setup_argparse():
                     help='Averaging exponent for recent loss printouts [0, inf), the higher the more smoothing (default = 50')
     parser.add_argument('--save', action=BoolArg, default=True,
                         help='Save checkpoint after each epoch. (default: True)')
-    parser.add_argument('--load', action=BoolArg, default=False,
-                        help='Load from previous checkpoint. (default: False)')
+    # parser.add_argument('--load', action=BoolArg, default=False,
+    #                     help='Load from previous checkpoint. (default: False)')
 
     parser.add_argument('--test', action=BoolArg, default=True,
                         help='Perform automated network testing. (Default: True)')
