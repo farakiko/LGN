@@ -76,6 +76,7 @@ def train(model, loader, optimizer, lr):
         model.eval()
 
     avg_loss_per_epoch = []
+    fractional_loss = []
 
     for i, batch in enumerate(loader):
         t0 = time.time()
@@ -105,9 +106,21 @@ def train(model, loader, optimizer, lr):
 
         avg_loss_per_epoch.append(batch_loss.item())
 
+        # added to attempt plotting over a fraction of an epoch
+        if i%(len(train_loader)/100)==0:
+                fractional_loss.append(sum(avg_loss_per_epoch)/len(avg_loss_per_epoch))
+                print('batch={}/{} train_loss={:.2f}'.format(i+1, len(loader), batch_loss.item()), end='\r')
+
         i += 1
 
     avg_loss_per_epoch = sum(avg_loss_per_epoch)/len(avg_loss_per_epoch)
+
+    fig, ax = plt.subplots()
+    ax.plot(range(len(fractional_loss)), fractional_loss, label='fractional loss')
+    ax.set_xlabel('Epochs')
+    ax.set_ylabel('Loss')
+    ax.legend(loc='best')
+    plt.savefig(outpath + '/fractional_loss.png')
 
     return avg_loss_per_epoch
 
@@ -171,15 +184,15 @@ def train_loop(args, model, optimizer, outpath):
 
 if __name__ == "__main__":
 
-    args = setup_argparse()
+    #args = setup_argparse()
 
-    # # the next part initializes some args values (to run the script not from terminal)
-    # class objectview(object):
-    #     def __init__(self, d):
-    #         self.__dict__ = d
-    #
-    # args = objectview({"num_train": 4, "num_valid": 2, "num_test": 2, "task": "train", "num_epoch": 4, "batch_size": 2, "batch_group_size": 1, "weight_decay": 0, "cutoff_decay": 0, "lr_init": 0.001, "lr_final": 1e-05, "lr_decay": 9999, "lr_decay_type": "cos", "lr_minibatch": True, "sgd_restart": -1, "optim": "amsgrad", "parallel": False, "shuffle": True, "seed": 1, "alpha": 50, "save": True, "test": True, "log_level": "info", "textlog": True, "predict": True, "quiet": True, "prefix": "nosave", "loadfile": "", "checkfile": "", "bestfile": "", "logfile": "", "predictfile": "", "workdir": "./", "logdir": "log/", "modeldir": "model/", "predictdir": "predict/", "datadir": "data/", "dataset": "jet", "target": "is_signal", "add_beams": False, "beam_mass": 1, "force_download": False, "cuda": True, "dtype": "float", "num_workers": 0, "pmu_in": False, "num_cg_levels": 3, "mlp_depth": 3, "mlp_width": 2, "maxdim": [3], "max_zf": [1], "num_channels": [2, 3, 4, 3], "level_gain": [1.0], "cutoff_type": ["learn"], "num_basis_fn": 10, "scale": 0.005, "full_scalars": False, "mlp": True, "activation": "leakyrelu", "weight_init": "randn", "input": "linear", "num_mpnn_levels": 1, "top": "linear", "gaussian_mask": False,
-    # 'patience': 100, 'outpath': 'trained_models/', 'train': False, 'load':True})
+    # the next part initializes some args values (to run the script not from terminal)
+    class objectview(object):
+        def __init__(self, d):
+            self.__dict__ = d
+
+    args = objectview({"num_train": 80, "num_valid": 2, "num_test": 2, "task": "train", "num_epoch": 1, "batch_size": 4, "batch_group_size": 1, "weight_decay": 0, "cutoff_decay": 0, "lr_init": 0.001, "lr_final": 1e-05, "lr_decay": 9999, "lr_decay_type": "cos", "lr_minibatch": True, "sgd_restart": -1, "optim": "amsgrad", "parallel": False, "shuffle": True, "seed": 1, "alpha": 50, "save": True, "test": True, "log_level": "info", "textlog": True, "predict": True, "quiet": True, "prefix": "nosave", "loadfile": "", "checkfile": "", "bestfile": "", "logfile": "", "predictfile": "", "workdir": "./", "logdir": "log/", "modeldir": "model/", "predictdir": "predict/", "datadir": "data/", "dataset": "jet", "target": "is_signal", "add_beams": False, "beam_mass": 1, "force_download": False, "cuda": True, "dtype": "float", "num_workers": 0, "pmu_in": False, "num_cg_levels": 3, "mlp_depth": 3, "mlp_width": 2, "maxdim": [3], "max_zf": [1], "num_channels": [2, 3, 4, 3], "level_gain": [1.0], "cutoff_type": ["learn"], "num_basis_fn": 10, "scale": 0.005, "full_scalars": False, "mlp": True, "activation": "leakyrelu", "weight_init": "randn", "input": "linear", "num_mpnn_levels": 1, "top": "linear", "gaussian_mask": False,
+    'patience': 100, 'outpath': 'trained_models/', 'train': True, 'load':False})
 
     with open("args_cache.json", "w") as f:
         json.dump(vars(args), f)
@@ -227,5 +240,5 @@ if __name__ == "__main__":
         train_loop(args, model, optimizer, outpath)
 
     if args.load:
-        PATH = args.outpath + '/LGNTopTag_model#__npar_4642__cfg_1250e9bc04__user_fmokhtar__ntrain_4000__lr_0.001__1613047688/epoch_0_weights.pth'
-        model.load_state_dict(torch.load(PATH))
+        PATH = args.outpath + '/LGNTopTag_model#__npar_4642__cfg_58bc55133f__user_jovyan__ntrain_1211000__lr_0.001__1613138754/epoch_3_weights.pth'
+        model.load_state_dict(torch.load(PATH, map_location=torch.device('cpu')))
