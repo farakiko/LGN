@@ -122,7 +122,7 @@ def train(model, loader, optimizer, lr):
     ax.legend(loc='best')
     plt.savefig(outpath + '/fractional_loss.png')
 
-    with open(outpath + '/fractional_loss.pkl', 'w') as f:  # Python 3: open(..., 'wb')
+    with open(outpath + '/fractional_loss.pkl', 'wb') as f:
         pickle.dump(fractional_loss, f)
 
     return avg_loss_per_epoch
@@ -183,7 +183,7 @@ def train_loop(args, model, optimizer, outpath):
     ax.legend(loc='best')
     plt.savefig(outpath + '/losses.png')
 
-    with open(outpath + '/losses.pkl', 'w') as f:  # Python 3: open(..., 'wb')
+    with open(outpath + '/losses.pkl', 'wb') as f: 
         pickle.dump([losses_train, losses_valid], f)
 
 #---------------------------------------------------------------------------------------------
