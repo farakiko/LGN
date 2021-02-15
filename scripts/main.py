@@ -108,7 +108,7 @@ def train(model, loader, optimizer, lr):
         avg_loss_per_epoch.append(batch_loss.item())
 
         # added to attempt plotting over a fraction of an epoch
-        if i==math.floor(0.01*len(train_loader)):
+        if (i % math.floor(0.01*len(train_loader)))==0 :
             fractional_loss.append(sum(avg_loss_per_epoch)/len(avg_loss_per_epoch))
             print('batch={}/{} train_loss={:.2f}'.format(i+1, len(loader), batch_loss.item()), end='\r')
 
