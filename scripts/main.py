@@ -122,6 +122,9 @@ def train(model, loader, optimizer, lr):
     ax.legend(loc='best')
     plt.savefig(outpath + '/fractional_loss.png')
 
+    with open(outpath + '/fractional_loss.pkl', 'w') as f:  # Python 3: open(..., 'wb')
+    pickle.dump(fractional_loss, f)
+
     return avg_loss_per_epoch
 
 
@@ -178,21 +181,24 @@ def train_loop(args, model, optimizer, outpath):
     ax.set_xlabel('Epochs')
     ax.set_ylabel('Loss')
     ax.legend(loc='best')
-    plt.savefig(outpath + '/loss.png')
+    plt.savefig(outpath + '/losses.png')
+
+    with open(outpath + '/losses.pkl', 'w') as f:  # Python 3: open(..., 'wb')
+    pickle.dump([losses_train, losses_valid], f)
 
 #---------------------------------------------------------------------------------------------
 
 if __name__ == "__main__":
 
-    #args = setup_argparse()
+    args = setup_argparse()
 
-    # the next part initializes some args values (to run the script not from terminal)
-    class objectview(object):
-        def __init__(self, d):
-            self.__dict__ = d
-
-    args = objectview({"num_train": 80, "num_valid": 2, "num_test": 2, "task": "train", "num_epoch": 1, "batch_size": 4, "batch_group_size": 1, "weight_decay": 0, "cutoff_decay": 0, "lr_init": 0.001, "lr_final": 1e-05, "lr_decay": 9999, "lr_decay_type": "cos", "lr_minibatch": True, "sgd_restart": -1, "optim": "amsgrad", "parallel": False, "shuffle": True, "seed": 1, "alpha": 50, "save": True, "test": True, "log_level": "info", "textlog": True, "predict": True, "quiet": True, "prefix": "nosave", "loadfile": "", "checkfile": "", "bestfile": "", "logfile": "", "predictfile": "", "workdir": "./", "logdir": "log/", "modeldir": "model/", "predictdir": "predict/", "datadir": "data/", "dataset": "jet", "target": "is_signal", "add_beams": False, "beam_mass": 1, "force_download": False, "cuda": True, "dtype": "float", "num_workers": 0, "pmu_in": False, "num_cg_levels": 3, "mlp_depth": 3, "mlp_width": 2, "maxdim": [3], "max_zf": [1], "num_channels": [2, 3, 4, 3], "level_gain": [1.0], "cutoff_type": ["learn"], "num_basis_fn": 10, "scale": 0.005, "full_scalars": False, "mlp": True, "activation": "leakyrelu", "weight_init": "randn", "input": "linear", "num_mpnn_levels": 1, "top": "linear", "gaussian_mask": False,
-    'patience': 100, 'outpath': 'trained_models/', 'train': True, 'load':False})
+    # # the next part initializes some args values (to run the script not from terminal)
+    # class objectview(object):
+    #     def __init__(self, d):
+    #         self.__dict__ = d
+    #
+    # args = objectview({"num_train": 80, "num_valid": 2, "num_test": 2, "task": "train", "num_epoch": 1, "batch_size": 4, "batch_group_size": 1, "weight_decay": 0, "cutoff_decay": 0, "lr_init": 0.001, "lr_final": 1e-05, "lr_decay": 9999, "lr_decay_type": "cos", "lr_minibatch": True, "sgd_restart": -1, "optim": "amsgrad", "parallel": False, "shuffle": True, "seed": 1, "alpha": 50, "save": True, "test": True, "log_level": "info", "textlog": True, "predict": True, "quiet": True, "prefix": "nosave", "loadfile": "", "checkfile": "", "bestfile": "", "logfile": "", "predictfile": "", "workdir": "./", "logdir": "log/", "modeldir": "model/", "predictdir": "predict/", "datadir": "data/", "dataset": "jet", "target": "is_signal", "add_beams": False, "beam_mass": 1, "force_download": False, "cuda": True, "dtype": "float", "num_workers": 0, "pmu_in": False, "num_cg_levels": 3, "mlp_depth": 3, "mlp_width": 2, "maxdim": [3], "max_zf": [1], "num_channels": [2, 3, 4, 3], "level_gain": [1.0], "cutoff_type": ["learn"], "num_basis_fn": 10, "scale": 0.005, "full_scalars": False, "mlp": True, "activation": "leakyrelu", "weight_init": "randn", "input": "linear", "num_mpnn_levels": 1, "top": "linear", "gaussian_mask": False,
+    # 'patience': 100, 'outpath': 'trained_models/', 'train': True, 'load':False})
 
     with open("args_cache.json", "w") as f:
         json.dump(vars(args), f)
