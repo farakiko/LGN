@@ -123,7 +123,7 @@ def train(model, loader, optimizer, lr):
     plt.savefig(outpath + '/fractional_loss.png')
 
     with open(outpath + '/fractional_loss.pkl', 'w') as f:  # Python 3: open(..., 'wb')
-    pickle.dump(fractional_loss, f)
+        pickle.dump(fractional_loss, f)
 
     return avg_loss_per_epoch
 
@@ -184,7 +184,7 @@ def train_loop(args, model, optimizer, outpath):
     plt.savefig(outpath + '/losses.png')
 
     with open(outpath + '/losses.pkl', 'w') as f:  # Python 3: open(..., 'wb')
-    pickle.dump([losses_train, losses_valid], f)
+        pickle.dump([losses_train, losses_valid], f)
 
 #---------------------------------------------------------------------------------------------
 
