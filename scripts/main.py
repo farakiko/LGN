@@ -127,11 +127,11 @@ def train(model, loader, optimizer, lr, epoch):
         ax.set_xlabel('Fraction of Epoch completed (% epoch)')
         ax.set_ylabel('Loss')
         ax.legend(loc='best')
-        plt.savefig(outpath + '/fractional_loss_train_epoch' + epoch+1 + '.png')
+        plt.savefig(outpath + '/fractional_loss_train_epoch' + str(epoch+1) + '.png')
 
-        with open(outpath + '/fractional_loss_train_epoch' + epoch+1 + '.png', 'wb') as f:
+        with open(outpath + '/fractional_loss_train_epoch' + str(epoch+1) + '.png', 'wb') as f:
             pickle.dump(fractional_loss, f)
-        with open(outpath + '/train_acc_epoch' + epoch+1 + '.png', 'wb') as f:
+        with open(outpath + '/train_acc_epoch' + str(epoch+1) + '.png', 'wb') as f:
             pickle.dump(acc, f)
 
     else:
@@ -140,11 +140,11 @@ def train(model, loader, optimizer, lr, epoch):
         ax.set_xlabel('Fraction of Epoch completed (% epoch)')
         ax.set_ylabel('Loss')
         ax.legend(loc='best')
-        plt.savefig(outpath + '/fractional_loss_test_epoch' + epoch+1 + '.png')
+        plt.savefig(outpath + '/fractional_loss_test_epoch' + str(epoch+1) + '.png')
 
-        with open(outpath + '/fractional_loss_test_epoch' + epoch+1 + '.png', 'wb') as f:
+        with open(outpath + '/fractional_loss_test_epoch' + str(epoch+1) + '.png', 'wb') as f:
             pickle.dump(fractional_loss, f)
-        with open(outpath + '/test_acc_epoch' + epoch+1 + '.png', 'wb') as f:
+        with open(outpath + '/test_acc_epoch' + str(epoch+1) + '.png', 'wb') as f:
             pickle.dump(acc, f)
 
     return avg_loss_per_epoch
@@ -274,3 +274,10 @@ if __name__ == "__main__":
 
 # with open('trained_models/LGNTopTag_model#__npar_4642__cfg_58bc55133f__user_jovyan__ntrain_400__lr_0.001__1613387635/fractional_loss_train.pkl', 'rb') as f:  # Python 3: open(..., 'rb')
 #     f = pickle.load(f)
+
+
+
+epoch =1
+
+
+print('lol'+str(epoch))
