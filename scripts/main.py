@@ -117,8 +117,6 @@ def train(model, loader, optimizer, lr, epoch):
         if (i % math.floor(0.01*len(loader)))==0 :
             fractional_loss.append(sum(avg_loss_per_epoch)/len(avg_loss_per_epoch))
 
-        i += 1
-
     avg_loss_per_epoch = sum(avg_loss_per_epoch)/len(avg_loss_per_epoch)
 
     if is_train:
@@ -129,9 +127,9 @@ def train(model, loader, optimizer, lr, epoch):
         ax.legend(loc='best')
         plt.savefig(outpath + '/fractional_loss_train_epoch_' + str(epoch+1) + '.png')
 
-        with open(outpath + '/fractional_loss_train_epoch_' + str(epoch+1) + '.png', 'wb') as f:
+        with open(outpath + '/fractional_loss_train_epoch_' + str(epoch+1) + '.pkl', 'wb') as f:
             pickle.dump(fractional_loss, f)
-        with open(outpath + '/train_acc_epoch_' + str(epoch+1) + '.png', 'wb') as f:
+        with open(outpath + '/train_acc_epoch_' + str(epoch+1) + '.pkl', 'wb') as f:
             pickle.dump(acc, f)
 
     else:
@@ -142,9 +140,9 @@ def train(model, loader, optimizer, lr, epoch):
         ax.legend(loc='best')
         plt.savefig(outpath + '/fractional_loss_test_epoch_' + str(epoch+1) + '.png')
 
-        with open(outpath + '/fractional_loss_test_epoch_' + str(epoch+1) + '.png', 'wb') as f:
+        with open(outpath + '/fractional_loss_test_epoch_' + str(epoch+1) + '.pkl', 'wb') as f:
             pickle.dump(fractional_loss, f)
-        with open(outpath + '/test_acc_epoch_' + str(epoch+1) + '.png', 'wb') as f:
+        with open(outpath + '/test_acc_epoch_' + str(epoch+1) + '.pkl', 'wb') as f:
             pickle.dump(acc, f)
 
     return avg_loss_per_epoch
