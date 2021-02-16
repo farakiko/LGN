@@ -62,12 +62,12 @@ def create_model_folder(args, model):
 
 # create the training loop
 @torch.no_grad()
-def test(model, loader):
+def test(model, loader, epoch):
     with torch.no_grad():
-        test_pred = train(model, loader, None, None)
+        test_pred = train(model, loader, None, None, epoch)
     return test_pred
 
-def train(model, loader, optimizer, lr):
+def train(model, loader, optimizer, lr, epoch):
 
     is_train = not (optimizer is None)
 
@@ -94,7 +94,7 @@ def train(model, loader, optimizer, lr):
         # backprop
         loss = nn.CrossEntropyLoss()
         batch_loss = loss(preds, Y.long())
-        #batch_loss = (nn.CrossEntropyLoss().cuda() if torch.cuda.is_available() else nn.CrossEntropyLoss())(preds, Y.long())
+
         if is_train:
             optimizer.zero_grad()
             batch_loss.backward()
@@ -102,6 +102,7 @@ def train(model, loader, optimizer, lr):
 
         t1 = time.time()
 
+        # to get some accuracy measure
         c = c + (preds.argmax(axis=1) == Y).sum().item()
         acc = 100*c/(args.batch_size*len(loader))
 
@@ -168,12 +169,12 @@ def train_loop(args, model, optimizer, outpath):
             break
 
         model.train()
-        train_loss = train(model, train_loader, optimizer, args.lr_init)
+        train_loss = train(model, train_loader, optimizer, args.lr_init, epoch)
         losses_train.append(train_loss)
 
         # test generalization of the model
         model.eval()
-        valid_loss = test(model, valid_loader)
+        valid_loss = test(model, valid_loader, epoch)
         losses_valid.append(valid_loss)
 
         if valid_loss < best_valid_loss:
