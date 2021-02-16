@@ -117,7 +117,7 @@ def train(model, loader, optimizer, lr, epoch):
         if (i % math.floor(0.01*len(loader)))==0 :
             fractional_loss.append(sum(avg_loss_per_epoch)/len(avg_loss_per_epoch))
 
-        #i += 1
+        i += 1
 
     avg_loss_per_epoch = sum(avg_loss_per_epoch)/len(avg_loss_per_epoch)
 
