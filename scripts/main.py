@@ -78,6 +78,8 @@ def train(model, loader, optimizer, lr):
 
     avg_loss_per_epoch = []
     fractional_loss = []
+    c = 0
+    acc = 0
 
     for i, batch in enumerate(loader):
         t0 = time.time()
@@ -100,19 +102,21 @@ def train(model, loader, optimizer, lr):
 
         t1 = time.time()
 
-        # if is_train:
-        #     print('batch={}/{} train_loss={:.2f} dt={:.1f}s'.format(i+1, len(loader), batch_loss.item(), t1-t0), end='\r', flush=True)
-        # else:
-        #     print('batch={}/{} valid_loss={:.2f} dt={:.1f}s'.format(i+1, len(loader), batch_loss.item(), t1-t0), end='\r', flush=True)
+        c = c + (preds.argmax(axis=1) == Y).sum().item()
+        acc = 100*c/(args.batch_size*len(loader))
+
+        if is_train:
+            print('batch={}/{} train_loss={:.2f} train_acc={:.1f} dt={:.1f}s'.format(i+1, len(loader), batch_loss.item(), acc, t1-t0), end='\r', flush=True)
+        else:
+            print('batch={}/{} valid_loss={:.2f} valid_acc={:.1f} dt={:.1f}s'.format(i+1, len(loader), batch_loss.item(), acc, t1-t0), end='\r', flush=True)
 
         avg_loss_per_epoch.append(batch_loss.item())
 
         # added to attempt plotting over a fraction of an epoch
-        if (i % math.floor(0.01*len(train_loader)))==0 :
+        if (i % math.floor(0.01*len(loader)))==0 :
             fractional_loss.append(sum(avg_loss_per_epoch)/len(avg_loss_per_epoch))
-            print('batch={}/{} train_loss={:.2f}'.format(i+1, len(loader), batch_loss.item()), end='\r')
 
-        i += 1
+        #i += 1
 
     avg_loss_per_epoch = sum(avg_loss_per_epoch)/len(avg_loss_per_epoch)
 
@@ -122,10 +126,12 @@ def train(model, loader, optimizer, lr):
         ax.set_xlabel('Fraction of Epoch completed (% epoch)')
         ax.set_ylabel('Loss')
         ax.legend(loc='best')
-        plt.savefig(outpath + '/fractional_loss_train.png')
+        plt.savefig(outpath + '/fractional_loss_train_epoch' + epoch+1 + '.png')
 
-        with open(outpath + '/fractional_loss_train.pkl', 'wb') as f:
+        with open(outpath + '/fractional_loss_train_epoch' + epoch+1 + '.png', 'wb') as f:
             pickle.dump(fractional_loss, f)
+        with open(outpath + '/train_acc_epoch' + epoch+1 + '.png', 'wb') as f:
+            pickle.dump(acc, f)
 
     else:
         fig, ax = plt.subplots()
@@ -133,10 +139,12 @@ def train(model, loader, optimizer, lr):
         ax.set_xlabel('Fraction of Epoch completed (% epoch)')
         ax.set_ylabel('Loss')
         ax.legend(loc='best')
-        plt.savefig(outpath + '/fractional_loss_test.png')
+        plt.savefig(outpath + '/fractional_loss_test_epoch' + epoch+1 + '.png')
 
-        with open(outpath + '/fractional_loss_test.pkl', 'wb') as f:
+        with open(outpath + '/fractional_loss_test_epoch' + epoch+1 + '.png', 'wb') as f:
             pickle.dump(fractional_loss, f)
+        with open(outpath + '/test_acc_epoch' + epoch+1 + '.png', 'wb') as f:
+            pickle.dump(acc, f)
 
     return avg_loss_per_epoch
 
@@ -210,7 +218,7 @@ if __name__ == "__main__":
     #     def __init__(self, d):
     #         self.__dict__ = d
     #
-    # args = objectview({"num_train": 400, "num_valid": 2, "num_test": 2, "task": "train", "num_epoch": 1, "batch_size": 2, "batch_group_size": 1, "weight_decay": 0, "cutoff_decay": 0, "lr_init": 0.001, "lr_final": 1e-05, "lr_decay": 9999, "lr_decay_type": "cos", "lr_minibatch": True, "sgd_restart": -1, "optim": "amsgrad", "parallel": False, "shuffle": True, "seed": 1, "alpha": 50, "save": True, "test": True, "log_level": "info", "textlog": True, "predict": True, "quiet": True, "prefix": "nosave", "loadfile": "", "checkfile": "", "bestfile": "", "logfile": "", "predictfile": "", "workdir": "./", "logdir": "log/", "modeldir": "model/", "predictdir": "predict/", "datadir": "data/", "dataset": "jet", "target": "is_signal", "add_beams": False, "beam_mass": 1, "force_download": False, "cuda": True, "dtype": "float", "num_workers": 0, "pmu_in": False, "num_cg_levels": 3, "mlp_depth": 3, "mlp_width": 2, "maxdim": [3], "max_zf": [1], "num_channels": [2, 3, 4, 3], "level_gain": [1.0], "cutoff_type": ["learn"], "num_basis_fn": 10, "scale": 0.005, "full_scalars": False, "mlp": True, "activation": "leakyrelu", "weight_init": "randn", "input": "linear", "num_mpnn_levels": 1, "top": "linear", "gaussian_mask": False,
+    # args = objectview({"num_train": -1, "num_valid": -1, "num_test": -1, "task": "train", "num_epoch": 1, "batch_size": 2, "batch_group_size": 1, "weight_decay": 0, "cutoff_decay": 0, "lr_init": 0.001, "lr_final": 1e-05, "lr_decay": 9999, "lr_decay_type": "cos", "lr_minibatch": True, "sgd_restart": -1, "optim": "amsgrad", "parallel": False, "shuffle": True, "seed": 1, "alpha": 50, "save": True, "test": True, "log_level": "info", "textlog": True, "predict": True, "quiet": True, "prefix": "nosave", "loadfile": "", "checkfile": "", "bestfile": "", "logfile": "", "predictfile": "", "workdir": "./", "logdir": "log/", "modeldir": "model/", "predictdir": "predict/", "datadir": "data/", "dataset": "jet", "target": "is_signal", "add_beams": False, "beam_mass": 1, "force_download": False, "cuda": True, "dtype": "float", "num_workers": 0, "pmu_in": False, "num_cg_levels": 3, "mlp_depth": 3, "mlp_width": 2, "maxdim": [3], "max_zf": [1], "num_channels": [2, 3, 4, 3], "level_gain": [1.0], "cutoff_type": ["learn"], "num_basis_fn": 10, "scale": 0.005, "full_scalars": False, "mlp": True, "activation": "leakyrelu", "weight_init": "randn", "input": "linear", "num_mpnn_levels": 1, "top": "linear", "gaussian_mask": False,
     # 'patience': 100, 'outpath': 'trained_models/', 'train': True, 'load':False})
 
     with open("args_cache.json", "w") as f:
@@ -259,10 +267,9 @@ if __name__ == "__main__":
         train_loop(args, model, optimizer, outpath)
 
     if args.load:
-        PATH = args.outpath + '/LGNTopTag_model#__npar_4642__cfg_58bc55133f__user_jovyan__ntrain_1211000__lr_0.001__1613138754/epoch_3_weights.pth'
+        PATH = args.outpath + '/LGNTopTag_model#__npar_4642__cfg_58bc55133f__user_jovyan__ntrain_1211000__lr_0.001__1613387946/epoch_0_weights.pth'
         model.load_state_dict(torch.load(PATH, map_location=torch.device('cpu')))
 
 
-
-# with open('../prp/lol/LGNTopTag_model#__npar_4642__cfg_58bc55133f__user_jovyan__ntrain_400__lr_0.001__1613386068/fractional_loss.pkl', 'rb') as f:  # Python 3: open(..., 'rb')
+# with open('trained_models/LGNTopTag_model#__npar_4642__cfg_58bc55133f__user_jovyan__ntrain_400__lr_0.001__1613387635/fractional_loss_train.pkl', 'rb') as f:  # Python 3: open(..., 'rb')
 #     f = pickle.load(f)
