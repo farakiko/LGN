@@ -10,6 +10,7 @@ import args
 from args import setup_argparse
 
 from data_processing.make_pytorch_data import initialize_datasets, data_to_loader
+import make_plots
 from lgn.models.lgn_toptag import LGNTopTag
 
 import json
@@ -22,21 +23,20 @@ import matplotlib.pyplot as plt
 import math
 
 # Get a unique directory name for each trained model
-def get_model_fname(dataset, model, n_train, lr):
+def get_model_fname(args, dataset, model):
     model_name = type(model).__name__
     model_params = sum(p.numel() for p in model.parameters())
     import hashlib
     model_cfghash = hashlib.blake2b(repr(model).encode()).hexdigest()[:10]
     model_user = os.environ['USER']
 
-    model_fname = '{}_{}__npar_{}__cfg_{}__user_{}__ntrain_{}__lr_{}__{}'.format(
+    model_fname = '{}_{}_epochs_{}_batch_{}_ntrain_{}_lr_{}'.format(
         model_name,
         dataset.split("/")[-1],
-        model_params,
-        model_cfghash,
-        model_user,
-        n_train,
-        lr, int(time.time()))
+        args.num_epoch,
+        args.batch_size,
+        args.num_train,
+        args.lr_init)
     return model_fname
 
 # Create the directory to store the weights/epoch for the trained models
@@ -44,7 +44,7 @@ def create_model_folder(args, model):
     if not osp.isdir(args.outpath):
         os.makedirs(args.outpath)
 
-    model_fname = get_model_fname('model#', model, args.num_train, args.lr_init)
+    model_fname = get_model_fname(args, 'model#', model)
     outpath = osp.join(args.outpath, model_fname)
 
     if osp.isdir(outpath):
@@ -138,11 +138,11 @@ def train(model, loader, optimizer, lr, epoch):
         ax.set_xlabel('Fraction of Epoch completed (% epoch)')
         ax.set_ylabel('Loss')
         ax.legend(loc='best')
-        plt.savefig(outpath + '/fractional_loss_test_epoch_' + str(epoch+1) + '.png')
+        plt.savefig(outpath + '/fractional_loss_valid_epoch_' + str(epoch+1) + '.png')
 
-        with open(outpath + '/fractional_loss_test_epoch_' + str(epoch+1) + '.pkl', 'wb') as f:
+        with open(outpath + '/fractional_loss_valid_epoch_' + str(epoch+1) + '.pkl', 'wb') as f:
             pickle.dump(fractional_loss, f)
-        with open(outpath + '/test_acc_epoch_' + str(epoch+1) + '.pkl', 'wb') as f:
+        with open(outpath + '/valid_acc_epoch_' + str(epoch+1) + '.pkl', 'wb') as f:
             pickle.dump(acc, f)
 
     return avg_loss_per_epoch
@@ -210,9 +210,9 @@ def train_loop(args, model, optimizer, outpath):
     ax.set_xlabel('Epochs')
     ax.set_ylabel('Loss')
     ax.legend(loc='best')
-    plt.savefig(outpath + '/loss_test.png')
+    plt.savefig(outpath + '/loss_valid.png')
 
-    with open(outpath + '/loss_test.pkl', 'wb') as f:
+    with open(outpath + '/loss_valid.pkl', 'wb') as f:
         pickle.dump(losses_valid, f)
 
 #---------------------------------------------------------------------------------------------
@@ -227,7 +227,8 @@ if __name__ == "__main__":
     #         self.__dict__ = d
     #
     # args = objectview({"num_train": -1, "num_valid": -1, "num_test": -1, "task": "train", "num_epoch": 1, "batch_size": 2, "batch_group_size": 1, "weight_decay": 0, "cutoff_decay": 0, "lr_init": 0.001, "lr_final": 1e-05, "lr_decay": 9999, "lr_decay_type": "cos", "lr_minibatch": True, "sgd_restart": -1, "optim": "amsgrad", "parallel": False, "shuffle": True, "seed": 1, "alpha": 50, "save": True, "test": True, "log_level": "info", "textlog": True, "predict": True, "quiet": True, "prefix": "nosave", "loadfile": "", "checkfile": "", "bestfile": "", "logfile": "", "predictfile": "", "workdir": "./", "logdir": "log/", "modeldir": "model/", "predictdir": "predict/", "datadir": "data/", "dataset": "jet", "target": "is_signal", "add_beams": False, "beam_mass": 1, "force_download": False, "cuda": True, "dtype": "float", "num_workers": 0, "pmu_in": False, "num_cg_levels": 3, "mlp_depth": 3, "mlp_width": 2, "maxdim": [3], "max_zf": [1], "num_channels": [2, 3, 4, 3], "level_gain": [1.0], "cutoff_type": ["learn"], "num_basis_fn": 10, "scale": 0.005, "full_scalars": False, "mlp": True, "activation": "leakyrelu", "weight_init": "randn", "input": "linear", "num_mpnn_levels": 1, "top": "linear", "gaussian_mask": False,
-    # 'patience': 100, 'outpath': 'trained_models/', 'train': True, 'load':False})
+    # 'patience': 100, 'outpath': 'trained_models/', 'train': False, 'load': True, 'test': True,
+    # 'load_model': 'LGNTopTag_model#four_epochs_batch32', 'load_epoch': 0})
 
     with open("args_cache.json", "w") as f:
         json.dump(vars(args), f)
@@ -275,9 +276,14 @@ if __name__ == "__main__":
         train_loop(args, model, optimizer, outpath)
 
     if args.load:
-        PATH = args.outpath + '/LGNTopTag_model#__npar_4642__cfg_58bc55133f__user_jovyan__ntrain_1211000__lr_0.001__1613387946/epoch_0_weights.pth'
-        model.load_state_dict(torch.load(PATH, map_location=torch.device('cpu')))
+        outpath = args.outpath + args.load_model
+        PATH = outpath + '/epoch_' + str(args.load_epoch) + '_weights.pth'
+        model.load_state_dict(torch.load(PATH, map_location=device))
+
+    if args.train or args.load:
+        if args.test:
+            make_plots.Evaluate(args, model, test_loader, outpath)
 
 
-# with open('trained_models/LGNTopTag_model#__npar_4642__cfg_58bc55133f__user_jovyan__ntrain_400__lr_0.001__1613387635/fractional_loss_train.pkl', 'rb') as f:  # Python 3: open(..., 'rb')
+# with open('trained_models/LGNTopTag_model#four_epochs_batch32/fractional_loss_train.pkl', 'rb') as f:  # Python 3: open(..., 'rb')
 #     f = pickle.load(f)
