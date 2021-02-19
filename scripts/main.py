@@ -35,13 +35,12 @@ def get_model_fname(args, dataset, model):
     model_cfghash = hashlib.blake2b(repr(model).encode()).hexdigest()[:10]
     model_user = os.environ['USER']
 
-    model_fname = '{}_{}_epochs_{}_batch_{}_ntrain_{}_lr_{}'.format(
+    model_fname = '{}_{}_epochs_{}_batch_{}_ntrain_{}'.format(
         model_name,
         dataset.split("/")[-1],
         args.num_epoch,
         args.batch_size,
-        args.num_train,
-        args.lr_init)
+        args.num_train)
     return model_fname
 
 # Create the directory to store the weights/epoch for the trained models
