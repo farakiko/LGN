@@ -66,7 +66,7 @@ def create_model_folder(args, model):
 @torch.no_grad()
 def test(model, loader, epoch):
     with torch.no_grad():
-        test_pred, _ = train(model, loader, None, None) # CONFUSION MATRIX
+        test_pred, _ = train(model, loader, None, None, epoch) # CONFUSION MATRIX
     return test_pred
 
 def train(model, loader, optimizer, lr, epoch):
