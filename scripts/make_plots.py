@@ -155,9 +155,8 @@ def plot_confusion_matrix(confusion_matrices, labels=["background", "signal"], e
 # outpath = args.outpath + '/LGNTopTag_model#four_epochs_batch32'
 #
 # Evaluate(args, model, test_loader, outpath)
-
-
-with open('trained_models/LGNTopTag_model#lol/confusion_matrix.pkl', 'rb') as f:  # Python 3: open(..., 'rb')
-    confusion_matrix = pickle.load(f)
-
-plot_confusion_matrix(confusion_matrix,savepath='trained_models/LGNTopTag_model#lol', format='png') # CONFUSION MATRIX
+# 
+# with open('trained_models/LGNTopTag_model#lol/confusion_matrix.pkl', 'rb') as f:  # Python 3: open(..., 'rb')
+#     confusion_matrix = pickle.load(f)
+#
+# plot_confusion_matrix(confusion_matrix,savepath='trained_models/LGNTopTag_model#lol', format='png') # CONFUSION MATRIX
