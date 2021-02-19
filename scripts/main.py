@@ -126,7 +126,7 @@ def train(model, loader, optimizer, lr, epoch):
     if is_train:
         fig, ax = plt.subplots()
         ax.plot(range(len(fractional_loss)), fractional_loss, label='fractional loss train')
-        ax.set_xlabel('Fraction of Epoch' + str(epoch+1) + 'completed (% epoch)')
+        ax.set_xlabel('Fraction of Epoch' + str(epoch+1) + ' completed (% epoch)')
         ax.set_ylabel('Loss')
         ax.legend(loc='best')
         plt.savefig(outpath + '/fractional_loss_train_epoch_' + str(epoch+1) + '.png')
@@ -139,7 +139,7 @@ def train(model, loader, optimizer, lr, epoch):
     else:
         fig, ax = plt.subplots()
         ax.plot(range(len(fractional_loss)), fractional_loss, label='fractional loss test')
-        ax.set_xlabel('Fraction of Epoch' + str(epoch+1) + 'completed (% epoch)')
+        ax.set_xlabel('Fraction of Epoch' + str(epoch+1) + ' completed (% epoch)')
         ax.set_ylabel('Loss')
         ax.legend(loc='best')
         plt.savefig(outpath + '/fractional_loss_valid_epoch_' + str(epoch+1) + '.png')
