@@ -221,6 +221,9 @@ def train_loop(args, model, optimizer, outpath):
     with open(outpath + '/loss_valid.pkl', 'wb') as f:
         pickle.dump(losses_valid, f)
 
+    with open(outpath + '/confusion_matrix.pkl', 'wb') as f:
+        pickle.dump(confusion_matrices, f)
+
     # plot_confusion_matrix(confusion_matrices,savepath=outpath, format='pdf') # CONFUSION MATRIX
 
 #---------------------------------------------------------------------------------------------
