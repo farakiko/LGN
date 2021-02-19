@@ -22,6 +22,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
+from confusion_matrix import * # CONFUSION MATRIX
+
 # Get a unique directory name for each trained model
 def get_model_fname(args, dataset, model):
     model_name = type(model).__name__
@@ -64,7 +66,7 @@ def create_model_folder(args, model):
 @torch.no_grad()
 def test(model, loader, epoch):
     with torch.no_grad():
-        test_pred = train(model, loader, None, None, epoch)
+        test_pred, _ = train(model, loader, None, None) # CONFUSION MATRIX
     return test_pred
 
 def train(model, loader, optimizer, lr, epoch):
@@ -90,6 +92,8 @@ def train(model, loader, optimizer, lr, epoch):
 
         # forwardprop
         preds = model(X)
+
+        confusion_matrix = generate_confusion_matrix(preds.argmax(axis=1), Y, num_classes=2) # CONFUSION MATRIX
 
         # backprop
         loss = nn.CrossEntropyLoss()
@@ -145,7 +149,7 @@ def train(model, loader, optimizer, lr, epoch):
         with open(outpath + '/valid_acc_epoch_' + str(epoch+1) + '.pkl', 'wb') as f:
             pickle.dump(acc, f)
 
-    return avg_loss_per_epoch
+    return avg_loss_per_epoch, confusion_matrix # CONFUSION MATRIX
 
 
 def train_loop(args, model, optimizer, outpath):
@@ -153,6 +157,7 @@ def train_loop(args, model, optimizer, outpath):
 
     losses_train = []
     losses_valid = []
+    confusion_matrices = [] # CONFUSION MATRIX
 
     best_valid_loss = 99999.9
     stale_epochs = 0
@@ -167,8 +172,9 @@ def train_loop(args, model, optimizer, outpath):
             break
 
         model.train()
-        train_loss = train(model, train_loader, optimizer, args.lr_init, epoch)
+        train_loss, confusion_matrix = train(model, train_loader, optimizer, args.lr_init) # CONFUSION MATRIX
         losses_train.append(train_loss)
+        confusion_matrices.append(confusion_matrix) # CONFUSION MATRIX
 
         # test generalization of the model
         model.eval()
@@ -214,6 +220,8 @@ def train_loop(args, model, optimizer, outpath):
 
     with open(outpath + '/loss_valid.pkl', 'wb') as f:
         pickle.dump(losses_valid, f)
+
+    # plot_confusion_matrix(confusion_matrices,savepath=outpath, format='pdf') # CONFUSION MATRIX
 
 #---------------------------------------------------------------------------------------------
 
