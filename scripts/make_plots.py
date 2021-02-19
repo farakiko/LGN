@@ -39,13 +39,16 @@ def Evaluate(args, model, test_loader, outpath):
     for i, batch in enumerate(test_loader):
         pred = model(batch)
 
-        preds.append(pred.detach().numpy())
-        targets.append(batch['is_signal'].detach().numpy())
+        preds.append(pred.detach().cpu().numpy())
+        targets.append(batch['is_signal'].detach().cpu().numpy())
 
         c = c + (preds[i].argmax(axis=1) == targets[i]).sum().item()
         acc = 100*c/(args.batch_size*len(test_loader))
 
-    with open(outpath + '/test_acc.pkl', 'wb') as f:
+        if i==1:
+            break
+
+    with open(outpath + 'test_acc.pkl', 'wb') as f:
         pickle.dump(acc, f)
 
     # create ROC curves
@@ -97,4 +100,9 @@ def Evaluate(args, model, test_loader, outpath):
 #                   scale=1., full_scalars=args.full_scalars, mlp=args.mlp, mlp_depth=args.mlp_depth, mlp_width=args.mlp_width,
 #                   device=torch.device("cuda:0" if torch.cuda.is_available() else "cpu"), dtype=torch.float)
 #
-# Evaluate(args, model, test_loader, '.')
+# PATH = args.outpath + '/LGNTopTag_model#one_epoch_batch32/epoch_0_weights.pth'
+# model.load_state_dict(torch.load(PATH, map_location=torch.device('cpu')))
+#
+# outpath = args.outpath + '/LGNTopTag_model#four_epochs_batch32'
+#
+# Evaluate(args, model, test_loader, outpath)
