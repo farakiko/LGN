@@ -172,7 +172,7 @@ def train_loop(args, model, optimizer, outpath):
             break
 
         model.train()
-        train_loss, confusion_matrix = train(model, train_loader, optimizer, args.lr_init) # CONFUSION MATRIX
+        train_loss, confusion_matrix = train(model, train_loader, optimizer, args.lr_init, epoch) # CONFUSION MATRIX
         losses_train.append(train_loss)
         confusion_matrices.append(confusion_matrix) # CONFUSION MATRIX
 
