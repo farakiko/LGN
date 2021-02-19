@@ -286,7 +286,7 @@ if __name__ == "__main__":
             for epoch in range(args.num_epoch):
                 # load the model per epoch to be tested
                 outpath = args.outpath + args.load_model
-                PATH = outpath + '/epoch_' + str(epoch)+1 + '_weights.pth'
+                PATH = outpath + '/epoch_' + str(epoch+1) + '_weights.pth'
                 model.load_state_dict(torch.load(PATH, map_location=device))
 
                 # evaluate the model
