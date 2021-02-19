@@ -7,11 +7,11 @@ def setup_argparse():
 
     parser = argparse.ArgumentParser(description='LGN network options')
 
-    parser.add_argument('--num-train', type=int, default=4000, metavar='N',
+    parser.add_argument('--num-train', type=int, default=-1, metavar='N',
                         help='Number of samples to train on. Set to -1 to use entire dataset. (default: -1)')
-    parser.add_argument('--num-valid', type=int, default=2000, metavar='N',
+    parser.add_argument('--num-valid', type=int, default=-1, metavar='N',
                         help='Number of validation samples to use. Set to -1 to use entire dataset. (default: -1)')
-    parser.add_argument('--num-test', type=int, default=2000, metavar='N',
+    parser.add_argument('--num-test', type=int, default=-1, metavar='N',
                         help='Number of test samples to use. Set to -1 to use entire dataset. (default: -1)')
 
     parser.add_argument('--task', type=str, default='train', metavar='str',
@@ -22,13 +22,14 @@ def setup_argparse():
     parser.add_argument("--outpath", type=str, default = 'trained_models/', help="Output folder")
     parser.add_argument("--train", action=BoolArg, default=True, help="Start training a model")
     parser.add_argument("--load", action=BoolArg, default=False, help="Load a pre-trained model")
-    parser.add_argument("--load-path", type=str, default='trained_models/LGNTopTag_model#__npar_4642__cfg_1250e9bc04__user_fmokhtar__ntrain_4000__lr_0.001__1613047688/epoch_0_weights.pth', help="Path to the weights of the model to be loaded")
-
+    parser.add_argument("--test", action=BoolArg, default=True, help="Test the model.. make roc curves")
+    parser.add_argument("--load-model", type=str, default='LGNTopTag_model#four_epochs_batch32', help="Path to the model to be loaded")
+    parser.add_argument("--load-epoch", type=int, default=0, help="Specefication of which epoch to load")
 
     # Optimizer options
-    parser.add_argument('--num-epoch', type=int, default=4, metavar='N',
+    parser.add_argument('--num-epoch', type=int, default=1, metavar='N',
                         help='number of epochs to train (default: 10)')
-    parser.add_argument('--batch-size', '-bs', type=int, default=32, metavar='N',
+    parser.add_argument('--batch-size', '-bs', type=int, default=2, metavar='N',
                         help='Mini-batch size (default: 10)')
     parser.add_argument('--batch-group-size', '-bgs', type=int, default=1, metavar='N',
                         help='Mini-batch size (default: 10)')
@@ -69,8 +70,8 @@ def setup_argparse():
     # parser.add_argument('--load', action=BoolArg, default=False,
     #                     help='Load from previous checkpoint. (default: False)')
 
-    parser.add_argument('--test', action=BoolArg, default=True,
-                        help='Perform automated network testing. (Default: True)')
+    # parser.add_argument('--test', action=BoolArg, default=True,
+    #                     help='Perform automated network testing. (Default: True)')
 
     parser.add_argument('--log-level', type=str, default='info',
                         help='Logging level to output')

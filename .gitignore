@@ -8,3 +8,5 @@ scripts/.DS_Store
 *.pyo
 
 */trained_models
+
+prp/
