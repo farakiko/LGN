@@ -96,8 +96,6 @@ def train(model, loader, optimizer, lr, epoch):
         # forwardprop
         preds = model(X)
 
-        confusion_matrix = generate_confusion_matrix(preds.argmax(axis=1), Y, num_classes=2) # CONFUSION MATRIX
-
         # backprop
         loss = nn.CrossEntropyLoss()
         batch_loss = loss(preds, Y.long())
@@ -152,7 +150,7 @@ def train(model, loader, optimizer, lr, epoch):
         with open(outpath + '/valid_acc_epoch_' + str(epoch+1) + '.pkl', 'wb') as f:
             pickle.dump(acc, f)
 
-    return avg_loss_per_epoch, confusion_matrix # CONFUSION MATRIX
+    return avg_loss_per_epoch
 
 
 def train_loop(args, model, optimizer, outpath):
@@ -160,7 +158,6 @@ def train_loop(args, model, optimizer, outpath):
 
     losses_train = []
     losses_valid = []
-    confusion_matrices = [] # CONFUSION MATRIX
 
     best_valid_loss = 99999.9
     stale_epochs = 0
@@ -175,9 +172,8 @@ def train_loop(args, model, optimizer, outpath):
             break
 
         model.train()
-        train_loss, confusion_matrix = train(model, train_loader, optimizer, args.lr_init, epoch) # CONFUSION MATRIX
+        train_loss = train(model, train_loader, optimizer, args.lr_init, epoch)
         losses_train.append(train_loss)
-        confusion_matrices.append(confusion_matrix) # CONFUSION MATRIX
 
         # test generalization of the model
         model.eval()
@@ -224,9 +220,6 @@ def train_loop(args, model, optimizer, outpath):
     with open(outpath + '/loss_valid.pkl', 'wb') as f:
         pickle.dump(losses_valid, f)
 
-    # msave confusion matrix variables for further plotting
-    with open(outpath + '/confusion_matrix.pkl', 'wb') as f:
-        pickle.dump(confusion_matrices, f)
 
 #---------------------------------------------------------------------------------------------
 
@@ -290,7 +283,14 @@ if __name__ == "__main__":
 
         # test the model
         if args.test:
-            make_plots.Evaluate(args, model, args.num_epoch, test_loader, outpath)
+            for epoch in args.num_epoch:
+                # load the model per epoch to be tested
+                outpath = args.outpath + args.load_model
+                PATH = outpath + '/epoch_' + str(epoch)+1 + '_weights.pth'
+                model.load_state_dict(torch.load(PATH, map_location=device))
+
+                # evaluate the model
+                make_plots.Evaluate(args, model, epoch, test_loader, outpath)
 
     if args.load:
         # load the model

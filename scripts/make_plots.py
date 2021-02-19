@@ -31,7 +31,7 @@ import matplotlib.pyplot as plt
 # plt.style.use(hep.style.ROOT)
 
 
-# Evaluate the model on test data.. (1) plots roc curves (2) plot conmfusion matrix
+# given a model, evaluate it on test data: (1) plot roc curves (2) plot confusion matrix
 def Evaluate(args, model, epoch, test_loader, outpath):
     model.eval()
 
@@ -49,33 +49,39 @@ def Evaluate(args, model, epoch, test_loader, outpath):
         c = c + (preds[i].argmax(axis=1) == targets[i]).sum().item()
         acc = 100*c/(args.batch_size*len(test_loader))
 
-    with open(outpath + '/test_acc.pkl', 'wb') as f:
-        pickle.dump(acc, f)
-
     preds = np.concatenate(preds)
     targets = np.concatenate(targets)
+
+    # store the accuracy
+    with open(outpath + '/test_acc_epoch_' + str(epoch+1) + '.pkl', 'wb') as f:
+        pickle.dump(acc, f)
 
     # make confusion matrix plots
     confusion_matrix = generate_confusion_matrix(torch.as_tensor(preds).argmax(axis=1), torch.as_tensor(targets), num_classes=2)
     plot_confusion_matrix(confusion_matrix, epoch, savepath=outpath, format='png')
+
+    with open(outpath + '/confusion_matrix_epoch_' + str(epoch+1) + '.pkl', 'wb') as f:
+        pickle.dump(confusion_matrix, f)
 
     # make ROC curves
     fpr_gnn, tpr_gnn, threshold_gnn = roc_curve(targets, preds[:,1])
 
     fig, ax = plt.subplots()
     ax.plot(tpr_gnn, 1/fpr_gnn, lw=2.5, label="GNN, AUC = {:.1f}%".format(auc(fpr_gnn,tpr_gnn)*100))
+    ax.set_title("Roc curves at Epoch" + str(epoch+1))
     ax.set_xlabel(r'Signal efficiency (TPR)')
     ax.set_ylabel(r'Background rejection (1/FPR)')
     ax.legend(loc='upper left')
-    plt.savefig(outpath + '/Roc_curves.png')
+    plt.savefig(outpath + '/Roc_curves_epoch_' + str(epoch+1) + '.png')
 
     fig, ax = plt.subplots()
     ax.plot(tpr_gnn, 1/fpr_gnn, lw=2.5, label="GNN, AUC = {:.1f}%".format(auc(fpr_gnn,tpr_gnn)*100))
+    ax.set_title("Roc curves at Epoch" + str(epoch+1))
     ax.set_xlabel(r'Signal efficiency (TPR)')
-    ax.set_ylabel(r'Background rejection (1/FPR)')
+    ax.set_ylabel(r'Background rejection (log(1/FPR))')
     ax.semilogy()
     ax.legend(loc='upper left')
-    plt.savefig(outpath + '/Roc_curves_log.png')
+    plt.savefig(outpath + '/Roc_curves_log_epoch_' + str(epoch+1)' '.png')
 
     return acc
 
@@ -129,7 +135,7 @@ def plot_confusion_matrix(confusion_matrices, epoch, labels=["background", "sign
     fig.tight_layout()
 
     if save:
-        plt.savefig(savepath+"/confusion_matrix_at_Epoch_{}.".format(epoch+1) +format, bbox_inches="tight")
+        plt.savefig(savepath+"/confusion_matrix_epoch_{}.".format(epoch+1) +format, bbox_inches="tight")
 
 #---------------------------------------------------------------------------------
 
