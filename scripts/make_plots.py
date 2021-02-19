@@ -5,6 +5,9 @@ import os.path as osp
 import sys
 sys.path.insert(1, 'data_processing/')
 sys.path.insert(1, 'lgn/')
+import warnings
+if not sys.warnoptions:
+    warnings.simplefilter("ignore")
 
 import args
 from args import setup_argparse
@@ -28,7 +31,8 @@ import matplotlib.pyplot as plt
 # plt.style.use(hep.style.ROOT)
 
 
-def Evaluate(args, model, test_loader, outpath):
+# Evaluate the model on test data.. (1) plots roc curves (2) plot conmfusion matrix
+def Evaluate(args, model, epoch, test_loader, outpath):
     model.eval()
 
     preds = []
@@ -48,19 +52,20 @@ def Evaluate(args, model, test_loader, outpath):
     with open(outpath + '/test_acc.pkl', 'wb') as f:
         pickle.dump(acc, f)
 
-    # create ROC curves
     preds = np.concatenate(preds)
     targets = np.concatenate(targets)
 
+    # make confusion matrix plots
+    confusion_matrix = generate_confusion_matrix(torch.as_tensor(preds).argmax(axis=1), torch.as_tensor(targets), num_classes=2)
+    plot_confusion_matrix(confusion_matrix, epoch, savepath=outpath, format='png')
+
+    # make ROC curves
     fpr_gnn, tpr_gnn, threshold_gnn = roc_curve(targets, preds[:,1])
 
-    # plot ROC curves
-    #plt.figure()
     fig, ax = plt.subplots()
     ax.plot(tpr_gnn, 1/fpr_gnn, lw=2.5, label="GNN, AUC = {:.1f}%".format(auc(fpr_gnn,tpr_gnn)*100))
     ax.set_xlabel(r'Signal efficiency (TPR)')
     ax.set_ylabel(r'Background rejection (1/FPR)')
-    #ax.grid(True)
     ax.legend(loc='upper left')
     plt.savefig(outpath + '/Roc_curves.png')
 
@@ -69,7 +74,6 @@ def Evaluate(args, model, test_loader, outpath):
     ax.set_xlabel(r'Signal efficiency (TPR)')
     ax.set_ylabel(r'Background rejection (1/FPR)')
     ax.semilogy()
-    #ax.grid(True)
     ax.legend(loc='upper left')
     plt.savefig(outpath + '/Roc_curves_log.png')
 
@@ -107,15 +111,15 @@ def plot_confusion_matrix(confusion_matrices, epoch, labels=["background", "sign
     fig = plt.figure()
     ax = fig.add_subplot(111)
     if normalize:
-        cax = ax.matshow(confusion_matrices[epoch], interpolation='nearest',cmap='viridis', vmin=0, vmax=1)
+        cax = ax.matshow(confusion_matrices, interpolation='nearest',cmap='viridis', vmin=0, vmax=1)
     else:
-        cax = ax.matshow(confusion_matrices[epoch], interpolation='nearest',cmap='viridis')
+        cax = ax.matshow(confusion_matrices, interpolation='nearest',cmap='viridis')
     fig.colorbar(cax)
 
     ax.set_xticklabels(['']+labels)
     ax.set_yticklabels(['']+labels)
 
-    for (i, j), z in np.ndenumerate(confusion_matrices[epoch]):
+    for (i, j), z in np.ndenumerate(confusion_matrices):
         ax.text(j, i, '{:0.1f}'.format(z), ha='center', va='center')
 
     ax.set_title("Confusion Matrix at Epoch" + str(epoch+1))
@@ -153,9 +157,4 @@ def plot_confusion_matrix(confusion_matrices, epoch, labels=["background", "sign
 #
 # outpath = args.outpath + '/LGNTopTag_model#four_epochs_batch32'
 #
-# Evaluate(args, model, test_loader, outpath)
-#
-# with open('trained_models/LGNTopTag_model#lol/confusion_matrix.pkl', 'rb') as f:  # Python 3: open(..., 'rb')
-#     confusion_matrix = pickle.load(f)
-#
-# plot_confusion_matrix(confusion_matrix, epoch=0, savepath='trained_models/LGNTopTag_model#lol', format='png') # CONFUSION MATRIX
+# Evaluate(args, model, 0, test_loader, outpath)

@@ -5,6 +5,9 @@ import os.path as osp
 import sys
 sys.path.insert(1, 'data_processing/')
 sys.path.insert(1, 'lgn/')
+import warnings
+if not sys.warnoptions:
+    warnings.simplefilter("ignore")
 
 import args
 from args import setup_argparse
@@ -194,15 +197,12 @@ def train_loop(args, model, optimizer, outpath):
 
         eta = epochs_remaining*time_per_epoch/60
 
-        torch.save(model.state_dict(), "{0}/epoch_{1}_weights.pth".format(outpath, epoch))
+        torch.save(model.state_dict(), "{0}/epoch_{1}_weights.pth".format(outpath, epoch+1))
 
         print("epoch={}/{} dt={:.2f}s train_loss={:.5f} valid_loss={:.5f} stale={} eta={:.1f}m".format(
             epoch+1, args.num_epoch,
             t1 - t0, train_loss, valid_loss,
             stale_epochs, eta))
-
-        # make confusion matrix plot per epoch
-        plot_confusion_matrix(confusion_matrices, epoch, savepath=outpath) 
 
     fig, ax = plt.subplots()
     ax.plot(range(len(losses_train)), losses_train, label='train loss')
@@ -288,14 +288,19 @@ if __name__ == "__main__":
         # start the training loop
         train_loop(args, model, optimizer, outpath)
 
+        # test the model
+        if args.test:
+            make_plots.Evaluate(args, model, args.num_epoch, test_loader, outpath)
+
     if args.load:
+        # load the model
         outpath = args.outpath + args.load_model
         PATH = outpath + '/epoch_' + str(args.load_epoch) + '_weights.pth'
         model.load_state_dict(torch.load(PATH, map_location=device))
 
-    if args.train or args.load:
+        # test the model
         if args.test:
-            make_plots.Evaluate(args, model, test_loader, outpath)
+            make_plots.Evaluate(args, model, args.load_epoch, test_loader, outpath)
 
 
 # with open('trained_models/LGNTopTag_model#four_epochs_batch32/fractional_loss_train.pkl', 'rb') as f:  # Python 3: open(..., 'rb')
