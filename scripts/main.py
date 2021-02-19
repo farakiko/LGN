@@ -22,7 +22,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
-from confusion_matrix import * # CONFUSION MATRIX
+from make_plots import * # Roc curves + CONFUSION MATRIX
 
 # Get a unique directory name for each trained model
 def get_model_fname(args, dataset, model):
@@ -201,6 +201,9 @@ def train_loop(args, model, optimizer, outpath):
             t1 - t0, train_loss, valid_loss,
             stale_epochs, eta))
 
+        # make confusion matrix plot per epoch
+        plot_confusion_matrix(confusion_matrices, epoch, savepath=outpath) 
+
     fig, ax = plt.subplots()
     ax.plot(range(len(losses_train)), losses_train, label='train loss')
     ax.set_xlabel('Epochs')
@@ -221,10 +224,9 @@ def train_loop(args, model, optimizer, outpath):
     with open(outpath + '/loss_valid.pkl', 'wb') as f:
         pickle.dump(losses_valid, f)
 
+    # msave confusion matrix variables for further plotting
     with open(outpath + '/confusion_matrix.pkl', 'wb') as f:
         pickle.dump(confusion_matrices, f)
-
-    # plot_confusion_matrix(confusion_matrices,savepath=outpath, format='pdf') # CONFUSION MATRIX
 
 #---------------------------------------------------------------------------------------------
 
