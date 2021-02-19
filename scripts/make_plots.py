@@ -81,7 +81,7 @@ def Evaluate(args, model, epoch, test_loader, outpath):
     ax.set_ylabel(r'Background rejection (log(1/FPR))')
     ax.semilogy()
     ax.legend(loc='upper left')
-    plt.savefig(outpath + '/Roc_curves_log_epoch_' + str(epoch+1)' '.png')
+    plt.savefig(outpath + '/Roc_curves_log_epoch_' + str(epoch+1)' + '.png')
 
     return acc
 
