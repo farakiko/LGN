@@ -187,7 +187,7 @@ def train_loop(args, model, optimizer, outpath):
 
         t1 = time.time()
 
-        epochs_remaining = args.num_epoch - epoch
+        epochs_remaining = args.num_epoch - (epoch+1)
         time_per_epoch = (t1 - t0_initial)/(epoch + 1)
 
         eta = epochs_remaining*time_per_epoch/60
