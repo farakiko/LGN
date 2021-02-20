@@ -26,6 +26,7 @@ import matplotlib.pyplot as plt
 import math
 
 from make_plots import * # Roc curves + CONFUSION MATRIX
+from training import *
 
 # Get a unique directory name for each trained model
 def get_model_fname(args, dataset, model):
@@ -64,162 +65,6 @@ def create_model_folder(args, model):
 
     return outpath
 
-# create the training loop
-@torch.no_grad()
-def test(model, loader, epoch):
-    with torch.no_grad():
-        test_pred = train(model, loader, None, None, epoch) # CONFUSION MATRIX
-    return test_pred
-
-def train(model, loader, optimizer, lr, epoch):
-
-    is_train = not (optimizer is None)
-
-    if is_train:
-        model.train()
-    else:
-        model.eval()
-
-    avg_loss_per_epoch = []
-    fractional_loss = []
-    c = 0
-    acc = 0
-
-    for i, batch in enumerate(loader):
-        t0 = time.time()
-
-        # for better reading of the code
-        X = batch
-        Y = batch['is_signal'].to(device)
-
-        # forwardprop
-        preds = model(X)
-
-        # backprop
-        loss = nn.CrossEntropyLoss()
-        batch_loss = loss(preds, Y.long())
-
-        if is_train:
-            optimizer.zero_grad()
-            batch_loss.backward()
-            optimizer.step()
-
-        t1 = time.time()
-
-        # to get some accuracy measure
-        c = c + (preds.argmax(axis=1) == Y).sum().item()
-        acc = 100*c/(args.batch_size*len(loader))
-
-        if is_train:
-            print('batch={}/{} train_loss={:.2f} train_acc={:.1f} dt={:.1f}s'.format(i+1, len(loader), batch_loss.item(), acc, t1-t0), end='\r', flush=True)
-        else:
-            print('batch={}/{} valid_loss={:.2f} valid_acc={:.1f} dt={:.1f}s'.format(i+1, len(loader), batch_loss.item(), acc, t1-t0), end='\r', flush=True)
-
-        avg_loss_per_epoch.append(batch_loss.item())
-
-        # added to attempt plotting over a fraction of an epoch
-        if (i % math.floor(0.01*len(loader)))==0 :
-            fractional_loss.append(sum(avg_loss_per_epoch)/len(avg_loss_per_epoch))
-
-    avg_loss_per_epoch = sum(avg_loss_per_epoch)/len(avg_loss_per_epoch)
-
-    if is_train:
-        fig, ax = plt.subplots()
-        ax.plot(range(len(fractional_loss)), fractional_loss, label='fractional loss train')
-        ax.set_xlabel('Fraction of Epoch' + str(epoch+1) + ' completed (% epoch)')
-        ax.set_ylabel('Loss')
-        ax.legend(loc='best')
-        plt.savefig(outpath + '/fractional_loss_train_epoch_' + str(epoch+1) + '.png')
-
-        with open(outpath + '/fractional_loss_train_epoch_' + str(epoch+1) + '.pkl', 'wb') as f:
-            pickle.dump(fractional_loss, f)
-        with open(outpath + '/train_acc_epoch_' + str(epoch+1) + '.pkl', 'wb') as f:
-            pickle.dump(acc, f)
-
-    else:
-        fig, ax = plt.subplots()
-        ax.plot(range(len(fractional_loss)), fractional_loss, label='fractional loss test')
-        ax.set_xlabel('Fraction of Epoch' + str(epoch+1) + ' completed (% epoch)')
-        ax.set_ylabel('Loss')
-        ax.legend(loc='best')
-        plt.savefig(outpath + '/fractional_loss_valid_epoch_' + str(epoch+1) + '.png')
-
-        with open(outpath + '/fractional_loss_valid_epoch_' + str(epoch+1) + '.pkl', 'wb') as f:
-            pickle.dump(fractional_loss, f)
-        with open(outpath + '/valid_acc_epoch_' + str(epoch+1) + '.pkl', 'wb') as f:
-            pickle.dump(acc, f)
-
-    return avg_loss_per_epoch
-
-
-def train_loop(args, model, optimizer, outpath):
-    t0_initial = time.time()
-
-    losses_train = []
-    losses_valid = []
-
-    best_valid_loss = 99999.9
-    stale_epochs = 0
-
-    print("Training over {} epochs".format(args.num_epoch))
-
-    for epoch in range(args.num_epoch):
-        t0 = time.time()
-
-        if stale_epochs > args.patience:
-            print("breaking due to stale epochs")
-            break
-
-        model.train()
-        train_loss = train(model, train_loader, optimizer, args.lr_init, epoch)
-        losses_train.append(train_loss)
-
-        # test generalization of the model
-        model.eval()
-        valid_loss = test(model, valid_loader, epoch)
-        losses_valid.append(valid_loss)
-
-        if valid_loss < best_valid_loss:
-            best_val_loss = valid_loss
-            stale_epochs = 0
-        else:
-            stale_epochs += 1
-
-        t1 = time.time()
-
-        epochs_remaining = args.num_epoch - (epoch+1)
-        time_per_epoch = (t1 - t0_initial)/(epoch + 1)
-
-        eta = epochs_remaining*time_per_epoch/60
-
-        torch.save(model.state_dict(), "{0}/epoch_{1}_weights.pth".format(outpath, epoch+1))
-
-        print("epoch={}/{} dt={:.2f}s train_loss={:.5f} valid_loss={:.5f} stale={} eta={:.1f}m".format(
-            epoch+1, args.num_epoch,
-            t1 - t0, train_loss, valid_loss,
-            stale_epochs, eta))
-
-    fig, ax = plt.subplots()
-    ax.plot(range(len(losses_train)), losses_train, label='train loss')
-    ax.set_xlabel('Epochs')
-    ax.set_ylabel('Loss')
-    ax.legend(loc='best')
-    plt.savefig(outpath + '/loss_train.png')
-
-    with open(outpath + '/loss_train.pkl', 'wb') as f:
-        pickle.dump(losses_train, f)
-
-    fig, ax = plt.subplots()
-    ax.plot(range(len(losses_valid)), losses_valid, label='test loss')
-    ax.set_xlabel('Epochs')
-    ax.set_ylabel('Loss')
-    ax.legend(loc='best')
-    plt.savefig(outpath + '/loss_valid.png')
-
-    with open(outpath + '/loss_valid.pkl', 'wb') as f:
-        pickle.dump(losses_valid, f)
-
-
 #---------------------------------------------------------------------------------------------
 
 if __name__ == "__main__":
@@ -231,8 +76,8 @@ if __name__ == "__main__":
     #     def __init__(self, d):
     #         self.__dict__ = d
     #
-    # args = objectview({"num_train": -1, "num_valid": -1, "num_test": -1, "task": "train", "num_epoch": 1, "batch_size": 2, "batch_group_size": 1, "weight_decay": 0, "cutoff_decay": 0, "lr_init": 0.001, "lr_final": 1e-05, "lr_decay": 9999, "lr_decay_type": "cos", "lr_minibatch": True, "sgd_restart": -1, "optim": "amsgrad", "parallel": False, "shuffle": True, "seed": 1, "alpha": 50, "save": True, "test": True, "log_level": "info", "textlog": True, "predict": True, "quiet": True, "prefix": "nosave", "loadfile": "", "checkfile": "", "bestfile": "", "logfile": "", "predictfile": "", "workdir": "./", "logdir": "log/", "modeldir": "model/", "predictdir": "predict/", "datadir": "data/", "dataset": "jet", "target": "is_signal", "add_beams": False, "beam_mass": 1, "force_download": False, "cuda": True, "dtype": "float", "num_workers": 0, "pmu_in": False, "num_cg_levels": 3, "mlp_depth": 3, "mlp_width": 2, "maxdim": [3], "max_zf": [1], "num_channels": [2, 3, 4, 3], "level_gain": [1.0], "cutoff_type": ["learn"], "num_basis_fn": 10, "scale": 0.005, "full_scalars": False, "mlp": True, "activation": "leakyrelu", "weight_init": "randn", "input": "linear", "num_mpnn_levels": 1, "top": "linear", "gaussian_mask": False,
-    # 'patience': 100, 'outpath': 'trained_models/', 'train': False, 'load': True, 'test': True,
+    # args = objectview({"num_train": 200, "num_valid": 200, "num_test": 200, "task": "train", "num_epoch": 1, "batch_size": 2, "batch_group_size": 1, "weight_decay": 0, "cutoff_decay": 0, "lr_init": 0.001, "lr_final": 1e-05, "lr_decay": 9999, "lr_decay_type": "cos", "lr_minibatch": True, "sgd_restart": -1, "optim": "amsgrad", "parallel": False, "shuffle": True, "seed": 1, "alpha": 50, "save": True, "test": True, "log_level": "info", "textlog": True, "predict": True, "quiet": True, "prefix": "nosave", "loadfile": "", "checkfile": "", "bestfile": "", "logfile": "", "predictfile": "", "workdir": "./", "logdir": "log/", "modeldir": "model/", "predictdir": "predict/", "datadir": "data/", "dataset": "jet", "target": "is_signal", "add_beams": False, "beam_mass": 1, "force_download": False, "cuda": True, "dtype": "float", "num_workers": 0, "pmu_in": False, "num_cg_levels": 3, "mlp_depth": 3, "mlp_width": 2, "maxdim": [3], "max_zf": [1], "num_channels": [2, 3, 4, 3], "level_gain": [1.0], "cutoff_type": ["learn"], "num_basis_fn": 10, "scale": 0.005, "full_scalars": False, "mlp": True, "activation": "leakyrelu", "weight_init": "randn", "input": "linear", "num_mpnn_levels": 1, "top": "linear", "gaussian_mask": False,
+    # 'patience': 100, 'outpath': 'trained_models/', 'train': True, 'load': True, 'test': True,
     # 'load_model': 'LGNTopTag_model#four_epochs_batch32', 'load_epoch': 0})
 
     with open("args_cache.json", "w") as f:
@@ -278,7 +123,7 @@ if __name__ == "__main__":
         optimizer = torch.optim.Adam(model.parameters(), args.lr_init)
 
         # start the training loop
-        train_loop(args, model, optimizer, outpath)
+        train_loop(args, model, optimizer, outpath, train_loader, valid_loader, device)
 
         # test the model
         if args.test:
