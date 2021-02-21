@@ -89,6 +89,7 @@ def train(args, model, loader, optimizer, lr, epoch, device, outpath):
         ax.set_ylabel('Loss')
         ax.legend(loc='best')
         plt.savefig(outpath + '/fractional_loss_train_epoch_' + str(epoch+1) + '.png')
+        plt.close(fig)
 
         with open(outpath + '/fractional_loss_train_epoch_' + str(epoch+1) + '.pkl', 'wb') as f:
             pickle.dump(fractional_loss, f)
@@ -102,6 +103,7 @@ def train(args, model, loader, optimizer, lr, epoch, device, outpath):
         ax.set_ylabel('Loss')
         ax.legend(loc='best')
         plt.savefig(outpath + '/fractional_loss_valid_epoch_' + str(epoch+1) + '.png')
+        plt.close(fig)
 
         with open(outpath + '/fractional_loss_valid_epoch_' + str(epoch+1) + '.pkl', 'wb') as f:
             pickle.dump(fractional_loss, f)
@@ -164,6 +166,7 @@ def train_loop(args, model, optimizer, outpath, train_loader, valid_loader, devi
     ax.set_ylabel('Loss')
     ax.legend(loc='best')
     plt.savefig(outpath + '/loss_train.png')
+    plt.close(fig)
 
     with open(outpath + '/loss_train.pkl', 'wb') as f:
         pickle.dump(losses_train, f)
@@ -174,6 +177,7 @@ def train_loop(args, model, optimizer, outpath, train_loader, valid_loader, devi
     ax.set_ylabel('Loss')
     ax.legend(loc='best')
     plt.savefig(outpath + '/loss_valid.png')
+    plt.close(fig)
 
     with open(outpath + '/loss_valid.pkl', 'wb') as f:
         pickle.dump(losses_valid, f)
