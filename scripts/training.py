@@ -139,7 +139,7 @@ def train_loop(args, model, optimizer, outpath, train_loader, valid_loader, devi
         losses_valid.append(valid_loss)
 
         if valid_loss < best_valid_loss:
-            best_val_loss = valid_loss
+            best_valid_loss = valid_loss
             stale_epochs = 0
         else:
             stale_epochs += 1
