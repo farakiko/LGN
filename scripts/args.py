@@ -24,13 +24,13 @@ def setup_argparse():
     parser.add_argument("--load", action=BoolArg, default=False, help="Load a pre-trained model")
     parser.add_argument("--test", action=BoolArg, default=True, help="Test the model.. make roc curves")
     parser.add_argument("--load-model", type=str, default='LGNTopTag_model#four_epochs_batch32', help="Path to the model to be loaded")
-    parser.add_argument("--load-epoch", type=int, default=1, help="Specefication of which epoch to load")
+    parser.add_argument("--load-epoch", type=int, default=1, help="Specefication of which epoch to load. Set to 0 to test over all the epochs the model has trained on.")
 
     # Optimizer options
     parser.add_argument('--num-epoch', type=int, default=1, metavar='N',
-                        help='number of epochs to train (default: 10)')
-    parser.add_argument('--batch-size', '-bs', type=int, default=2, metavar='N',
-                        help='Mini-batch size (default: 10)')
+                        help='number of epochs to train.')
+    parser.add_argument('--batch-size', '-bs', type=int, default=32, metavar='N',
+                        help='Mini-batch size.')
     parser.add_argument('--batch-group-size', '-bgs', type=int, default=1, metavar='N',
                         help='Mini-batch size (default: 10)')
 
