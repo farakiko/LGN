@@ -27,8 +27,8 @@ import math
 @torch.no_grad()
 def test(args, model, loader, epoch, device, outpath):
     with torch.no_grad():
-        test_pred = train(args, model, loader, None, None, epoch, device, outpath) # CONFUSION MATRIX
-    return test_pred
+        test_pred, acc = train(args, model, loader, None, None, epoch, device, outpath) # CONFUSION MATRIX
+    return test_pred, acc
 
 def train(args, model, loader, optimizer, lr, epoch, device, outpath):
 
@@ -110,7 +110,7 @@ def train(args, model, loader, optimizer, lr, epoch, device, outpath):
         with open(outpath + '/valid_acc_epoch_' + str(epoch+1) + '.pkl', 'wb') as f:
             pickle.dump(acc, f)
 
-    return avg_loss_per_epoch
+    return avg_loss_per_epoch, acc
 
 
 def train_loop(args, model, optimizer, outpath, train_loader, valid_loader, device):
@@ -132,12 +132,12 @@ def train_loop(args, model, optimizer, outpath, train_loader, valid_loader, devi
             break
 
         model.train()
-        train_loss = train(args, model, train_loader, optimizer, args.lr_init, epoch, device, outpath)
+        train_loss, train_acc = train(args, model, train_loader, optimizer, args.lr_init, epoch, device, outpath)
         losses_train.append(train_loss)
 
         # test generalization of the model
         model.eval()
-        valid_loss = test(args, model, valid_loader, epoch, device, outpath)
+        valid_loss, valid_acc = test(args, model, valid_loader, epoch, device, outpath)
         losses_valid.append(valid_loss)
 
         if valid_loss < best_valid_loss:
@@ -155,9 +155,9 @@ def train_loop(args, model, optimizer, outpath, train_loader, valid_loader, devi
 
         torch.save(model.state_dict(), "{0}/epoch_{1}_weights.pth".format(outpath, epoch+1))
 
-        print("epoch={}/{} dt={:.2f}s train_loss={:.5f} valid_loss={:.5f} stale={} eta={:.1f}m".format(
+        print("epoch={}/{} dt={:.2f}s train_loss={:.5f} valid_loss={:.5f} train_acc={:.5f} valid_acc={:.5f} stale={} eta={:.1f}m".format(
             epoch+1, args.num_epoch,
-            t1 - t0, train_loss, valid_loss,
+            t1 - t0, train_loss, valid_loss, train_acc, valid_acc,
             stale_epochs, eta))
 
     fig, ax = plt.subplots()
