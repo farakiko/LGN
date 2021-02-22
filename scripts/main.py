@@ -136,8 +136,6 @@ if __name__ == "__main__":
                 make_plots.Evaluate(args, model, epoch, test_loader, outpath)
 
     if args.load:
-        if not osp.isdir(args.outpath):
-            os.makedirs(args.outpath)
         # load the model
         outpath = args.outpath + args.load_model
         PATH = outpath + '/epoch_' + str(args.load_epoch) + '_weights.pth'
