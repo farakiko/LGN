@@ -23,8 +23,8 @@ def setup_argparse():
     parser.add_argument("--train", action=BoolArg, default=True, help="Start training a model")
     parser.add_argument("--load", action=BoolArg, default=False, help="Load a pre-trained model")
     parser.add_argument("--test", action=BoolArg, default=True, help="Test the model.. make roc curves & confusion matrix")
-    parser.add_argument("--load-model", type=str, default='LGNTopTag_model#four_epochs_batch32', help="Path to the model to be loaded")
-    parser.add_argument("--load-epoch", type=int, default=1, help="Specefication of which epoch to load. Set to 0 to test over all the epochs the model has trained on.")
+    parser.add_argument("--load-model", type=str, default='LGNTopTag_model#four_epochs_batch32_with_acc', help="Path to the model to be loaded")
+    parser.add_argument("--load-epoch", type=int, default=0, help="Specefication of which epoch to load. Set to 0 to test over all the epochs the model has trained on.")
 
     # Optimizer options
     parser.add_argument('--num-epoch', type=int, default=1, metavar='N',
