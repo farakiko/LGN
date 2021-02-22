@@ -24,6 +24,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
+import sklearn
 from sklearn.metrics import confusion_matrix, roc_auc_score, roc_curve
 from sklearn.metrics import roc_curve, auc
 import matplotlib.pyplot as plt
