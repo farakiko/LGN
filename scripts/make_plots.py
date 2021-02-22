@@ -101,7 +101,7 @@ def Evaluate(args, model, epoch, test_loader, outpath):
 
 def plot_confusion_matrix(confusion_matrix, epoch, outpath):
     fig, ax = plt.subplots()
-    sns.heatmap(confusion_matrix, annot=True, ax = ax, cmap=cmap) #annot=True to annotate cells
+    sns.heatmap(confusion_matrix, annot=True, ax = ax) #annot=True to annotate cells
     ax.set_title('Confusion Matrix at Epoch' + str(epoch+1))
     ax.set_xlabel('Predicted labels')
     ax.set_ylabel('True labels')
