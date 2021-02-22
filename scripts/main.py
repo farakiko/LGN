@@ -136,6 +136,8 @@ if __name__ == "__main__":
                 make_plots.Evaluate(args, model, epoch, test_loader, outpath)
 
     if args.load:
+        if not osp.isdir(args.outpath):
+            os.makedirs(args.outpath)
         # load the model
         outpath = args.outpath + args.load_model
         PATH = outpath + '/epoch_' + str(args.load_epoch) + '_weights.pth'
@@ -153,3 +155,7 @@ if __name__ == "__main__":
 
 # with open('trained_models/LGNTopTag_model#four_epochs_batch32/fractional_loss_train.pkl', 'rb') as f:  # Python 3: open(..., 'rb')
 #     f = pickle.load(f)
+
+
+trained_models/LGNTopTag_model#four_epochs_batch32_with_acc/epoch_0_weights.pth'
+trained_models/LGNTopTag_model#four_epochs_batch32_with_acc/epoch_0_weights
