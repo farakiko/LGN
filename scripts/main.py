@@ -148,12 +148,8 @@ if __name__ == "__main__":
                 for epoch in range(args.num_epoch):
                     make_plots.Evaluate(args, model, epoch, test_loader, outpath)
             else:
-                make_plots.Evaluate(args, model, args.load_epoch-1, test_loader, outpath)
+                make_plots.Evaluate(args, model, args.load_epoch, test_loader, outpath)
 
 
 # with open('trained_models/LGNTopTag_model#four_epochs_batch32/fractional_loss_train.pkl', 'rb') as f:  # Python 3: open(..., 'rb')
 #     f = pickle.load(f)
-
-
-trained_models/LGNTopTag_model#four_epochs_batch32_with_acc/epoch_0_weights.pth'
-trained_models/LGNTopTag_model#four_epochs_batch32_with_acc/epoch_0_weights
