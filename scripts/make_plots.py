@@ -49,7 +49,7 @@ def Evaluate(args, model, epoch, test_loader, outpath):
         targets.append(batch['is_signal'].detach().cpu().numpy())
 
         c = c + (preds[i].argmax(axis=1) == targets[i]).sum().item()
-        acc = 100*c/(args.batch_size*len(test_loader))
+        acc = 100*c/(args.batch_size_test*len(test_loader))
 
     preds = np.concatenate(preds)
     targets = np.concatenate(targets)
