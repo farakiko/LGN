@@ -13,7 +13,6 @@ import args
 from args import setup_argparse
 
 from data_processing.make_pytorch_data import initialize_datasets, data_to_loader
-import make_plots
 from lgn.models.lgn_toptag import LGNTopTag
 
 import json
@@ -26,6 +25,7 @@ import matplotlib.pyplot as plt
 import math
 
 from training import train_loop
+import evaluate
 from evaluate import Evaluate # Roc curves + CONFUSION MATRIX
 
 # Get a unique directory name for each trained model
