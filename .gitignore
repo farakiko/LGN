@@ -10,3 +10,5 @@ scripts/.DS_Store
 */trained_models
 
 prp/
+
+*/playground.py
