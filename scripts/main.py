@@ -133,6 +133,7 @@ if __name__ == "__main__":
                 model.load_state_dict(torch.load(PATH, map_location=device))
 
                 # evaluate the model
+                print("Now testing the model for epoch=", epoch+1)
                 make_plots.Evaluate(args, model, epoch, test_loader, outpath)
 
         # test the model over the last epoch only
@@ -141,6 +142,7 @@ if __name__ == "__main__":
             model.load_state_dict(torch.load(PATH, map_location=device))
 
             # evaluate the model
+            print("Now testing the model for epoch=", args.num_epoch+1)
             make_plots.Evaluate(args, model, args.num_epoch, test_loader, outpath)
 
 
@@ -152,6 +154,7 @@ if __name__ == "__main__":
                 model.load_state_dict(torch.load(PATH, map_location=device))
 
                 # evaluate the model
+                print("Now testing the loaded model for epoch=", epoch+1)
                 make_plots.Evaluate(args, model, epoch, test_loader, outpath)
 
         else:
