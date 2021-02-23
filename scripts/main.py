@@ -133,7 +133,7 @@ if __name__ == "__main__":
                 model.load_state_dict(torch.load(PATH, map_location=device))
 
                 # evaluate the model
-                print("Now testing the model for epoch=", epoch+1)
+                print("Now testing the model for epoch =", epoch+1)
                 Evaluate(args, model, epoch, test_loader, outpath)
 
         # test the model over the last epoch only
@@ -142,8 +142,8 @@ if __name__ == "__main__":
             model.load_state_dict(torch.load(PATH, map_location=device))
 
             # evaluate the model
-            print("Now testing the model for epoch=", args.num_epoch+1)
-            Evaluate(args, model, args.num_epoch, test_loader, outpath)
+            print("Now testing the model for epoch =", args.num_epoch)
+            Evaluate(args, model, args.num_epoch-1, test_loader, outpath)
 
 
     if args.load:
@@ -154,7 +154,7 @@ if __name__ == "__main__":
                 model.load_state_dict(torch.load(PATH, map_location=device))
 
                 # evaluate the model
-                print("Now testing the loaded model for epoch=", epoch+1)
+                print("Now testing the loaded model for epoch =", epoch+1)
                 Evaluate(args, model, epoch, test_loader, outpath)
 
         else:
@@ -162,7 +162,7 @@ if __name__ == "__main__":
             PATH = outpath + '/epoch_' + str(args.load_epoch) + '_weights.pth'
             model.load_state_dict(torch.load(PATH, map_location=device))
             # test only the chosen epoch
-            Evaluate(args, model, args.load_epoch, test_loader, outpath)
+            Evaluate(args, model, args.load_epoch-1, test_loader, outpath)
 
 
 # with open('trained_models/LGNTopTag_model#four_epochs_batch32/fractional_loss_train.pkl', 'rb') as f:  # Python 3: open(..., 'rb')
