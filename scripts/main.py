@@ -25,8 +25,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
-from make_plots import * # Roc curves + CONFUSION MATRIX
-from training import *
+from training import train_loop
+from evaluate import Evaluate # Roc curves + CONFUSION MATRIX
 
 # Get a unique directory name for each trained model
 def get_model_fname(args, dataset, model):
@@ -134,7 +134,7 @@ if __name__ == "__main__":
 
                 # evaluate the model
                 print("Now testing the model for epoch=", epoch+1)
-                make_plots.Evaluate(args, model, epoch, test_loader, outpath)
+                Evaluate(args, model, epoch, test_loader, outpath)
 
         # test the model over the last epoch only
         elif args.test:
@@ -143,7 +143,7 @@ if __name__ == "__main__":
 
             # evaluate the model
             print("Now testing the model for epoch=", args.num_epoch+1)
-            make_plots.Evaluate(args, model, args.num_epoch, test_loader, outpath)
+            Evaluate(args, model, args.num_epoch, test_loader, outpath)
 
 
     if args.load:
@@ -155,14 +155,14 @@ if __name__ == "__main__":
 
                 # evaluate the model
                 print("Now testing the loaded model for epoch=", epoch+1)
-                make_plots.Evaluate(args, model, epoch, test_loader, outpath)
+                Evaluate(args, model, epoch, test_loader, outpath)
 
         else:
             # load the desired model
             PATH = outpath + '/epoch_' + str(args.load_epoch) + '_weights.pth'
             model.load_state_dict(torch.load(PATH, map_location=device))
             # test only the chosen epoch
-            make_plots.Evaluate(args, model, args.load_epoch, test_loader, outpath)
+            Evaluate(args, model, args.load_epoch, test_loader, outpath)
 
 
 # with open('trained_models/LGNTopTag_model#four_epochs_batch32/fractional_loss_train.pkl', 'rb') as f:  # Python 3: open(..., 'rb')
