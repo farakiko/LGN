@@ -48,7 +48,7 @@ def train(args, model, loader, optimizer, lr, epoch, device, outpath):
         t0 = time.time()
 
         # for better reading of the code
-        X = batch
+        X = batch.to(device)
         Y = batch['is_signal'].to(device)
 
         # forwardprop
