@@ -158,6 +158,9 @@ if __name__ == "__main__":
                 make_plots.Evaluate(args, model, epoch, test_loader, outpath)
 
         else:
+            # load the desired model
+            PATH = outpath + '/epoch_' + str(args.load_epoch) + '_weights.pth'
+            model.load_state_dict(torch.load(PATH, map_location=device))
             # test only the chosen epoch
             make_plots.Evaluate(args, model, args.load_epoch, test_loader, outpath)
 
