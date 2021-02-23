@@ -83,7 +83,7 @@ def data_to_loader(args, torch_datasets):
     train_loader = DataLoader(torch_datasets['train'], batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
     train_loader.collate_fn = collate_fn
 
-    test_loader = DataLoader(torch_datasets['test'], batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
+    test_loader = DataLoader(torch_datasets['test'], batch_size=args.batch_size_test, shuffle=True, num_workers=args.num_workers)
     test_loader.collate_fn = collate_fn
 
     valid_loader = DataLoader(torch_datasets['valid'], batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
