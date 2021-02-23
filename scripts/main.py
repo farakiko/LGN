@@ -125,8 +125,8 @@ if __name__ == "__main__":
         # start the training loop
         train_loop(args, model, optimizer, outpath, train_loader, valid_loader, device)
 
-        # test the model
-        if args.test:
+        # test over all the epochs trained
+        if args.test_over_all_epoch:
             for epoch in range(args.num_epoch):
                 # load the model per epoch to be tested
                 PATH = outpath + '/epoch_' + str(epoch+1) + '_weights.pth'
@@ -135,26 +135,28 @@ if __name__ == "__main__":
                 # evaluate the model
                 make_plots.Evaluate(args, model, epoch, test_loader, outpath)
 
+        # test the model over the last epoch only
+        elif args.test:
+            PATH = outpath + '/epoch_' + str(args.num_epoch) + '_weights.pth'
+            model.load_state_dict(torch.load(PATH, map_location=device))
+
+            # evaluate the model
+            make_plots.Evaluate(args, model, args.num_epoch, test_loader, outpath)
+
+
     if args.load:
-        # load the model
-        outpath = args.outpath + args.load_model
-        PATH = outpath + '/epoch_' + str(args.load_epoch) + '_weights.pth'
-        model.load_state_dict(torch.load(PATH, map_location=device))
+        if args.load_epoch == 0:
+            for epoch in range(args.num_epoch):
+                # load the correct model per epoch
+                PATH = outpath + '/epoch_' + str(epoch+1) + '_weights.pth'
+                model.load_state_dict(torch.load(PATH, map_location=device))
 
-        if args.test:
-            # test the model over all epochs if specefied
-            if args.load_epoch == 0:
-                for epoch in range(args.num_epoch):
-                    # load the correct model per epoch
-                    PATH = outpath + '/epoch_' + str(epoch+1) + '_weights.pth'
-                    model.load_state_dict(torch.load(PATH, map_location=device))
+                # evaluate the model
+                make_plots.Evaluate(args, model, epoch, test_loader, outpath)
 
-                    # evaluate the model
-                    make_plots.Evaluate(args, model, epoch, test_loader, outpath)
-
-            else:
-                # test only the chosen epoch
-                make_plots.Evaluate(args, model, args.load_epoch, test_loader, outpath)
+        else:
+            # test only the chosen epoch
+            make_plots.Evaluate(args, model, args.load_epoch, test_loader, outpath)
 
 
 # with open('trained_models/LGNTopTag_model#four_epochs_batch32/fractional_loss_train.pkl', 'rb') as f:  # Python 3: open(..., 'rb')
