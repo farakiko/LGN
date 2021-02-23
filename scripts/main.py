@@ -133,7 +133,7 @@ if __name__ == "__main__":
                 model.load_state_dict(torch.load(PATH, map_location=device))
 
                 # evaluate the model
-                make_plots.Evaluate(args, model, epoch, train_loader, outpath) #just for gpu testing
+                make_plots.Evaluate(args, model, epoch, train_loader, outpath)
 
     if args.load:
         # load the model
@@ -153,35 +153,3 @@ if __name__ == "__main__":
 
 # with open('trained_models/LGNTopTag_model#four_epochs_batch32/fractional_loss_train.pkl', 'rb') as f:  # Python 3: open(..., 'rb')
 #     f = pickle.load(f)
-
-
-
-import matplotlib
-import matplotlib.pyplot as plt
-import numpy as np
-
-# Data for plotting
-t = np.arange(0.0, 2.0, 0.01)
-s = 1 + np.sin(2 * np.pi * t)
-
-fig, ax = plt.subplots()
-ax.plot(t, s)
-
-ax.set(xlabel='time (s)', ylabel='voltage (mV)',
-       title='About as simple as it gets, folks')
-ax.grid()
-
-fig.savefig("test.png")
-plt.show()
-
-
-
-ep = [20446, 17074, 18690, 19466, 16246, 14801, 14286, 14027, 15742, 16658, 19762, 18119, 30457, 29605.74, 29574.93, 31958.58, 35742.84, 35641.42]
-
-ep = [x/3600 for x in ep]
-
-fig, ax = plt.subplots()
-plt.xticks([1, 2, 3, 4, 5, 6, 7,8 ,9,10,11,12,13,14,15,16,17,18])
-ax.plot(range(len(ep)), ep)
-ax.set_xlabel('Epoch')
-ax.set_ylabel('Training time (in hours)')
