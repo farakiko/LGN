@@ -150,7 +150,8 @@ if __name__ == "__main__":
         if args.load_epoch == -1:
             for epoch in range(args.num_epoch):
                 # load the correct model per epoch
-                PATH = args.outpath + args.load_model + '/epoch_' + str(epoch) + '_weights.pth'   ## note: str(epoch+1) if model saves epoch starting with 1
+                outpath = args.outpath + args.load_model
+                PATH = outpath + '/epoch_' + str(epoch) + '_weights.pth'   ## note: str(epoch+1) if model saves epoch starting with 1
                 model.load_state_dict(torch.load(PATH, map_location=device))
 
                 # evaluate the model
@@ -159,6 +160,7 @@ if __name__ == "__main__":
 
         else:
             # load the desired model
+            outpath = args.outpath + args.load_model
             PATH = outpath + '/epoch_' + str(args.load_epoch) + '_weights.pth'
             model.load_state_dict(torch.load(PATH, map_location=device))
             # test only the chosen epoch
