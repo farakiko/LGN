@@ -133,7 +133,7 @@ if __name__ == "__main__":
                 model.load_state_dict(torch.load(PATH, map_location=device))
 
                 # evaluate the model
-                make_plots.Evaluate(args, model, epoch, test_loader, outpath)
+                make_plots.Evaluate(args, model, epoch, train_loader, outpath)
 
     if args.load:
         # load the model
