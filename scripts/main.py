@@ -141,13 +141,19 @@ if __name__ == "__main__":
         PATH = outpath + '/epoch_' + str(args.load_epoch) + '_weights.pth'
         model.load_state_dict(torch.load(PATH, map_location=device))
 
-        # test the model
         if args.test:
-            # test the loaded model over all epochs
+            # test the model over all epochs if specefied
             if args.load_epoch == 0:
                 for epoch in range(args.num_epoch):
+                    # load the correct model per epoch
+                    PATH = outpath + '/epoch_' + str(epoch+1) + '_weights.pth'
+                    model.load_state_dict(torch.load(PATH, map_location=device))
+
+                    # evaluate the model
                     make_plots.Evaluate(args, model, epoch, test_loader, outpath)
+
             else:
+                # test only the chosen epoch
                 make_plots.Evaluate(args, model, args.load_epoch, test_loader, outpath)
 
 
