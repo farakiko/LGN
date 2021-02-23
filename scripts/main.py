@@ -147,7 +147,7 @@ if __name__ == "__main__":
 
 
     if args.load:
-        if args.load_epoch == 0:
+        if args.load_epoch == -1:
             for epoch in range(args.num_epoch):
                 # load the correct model per epoch
                 PATH = outpath + '/epoch_' + str(epoch+1) + '_weights.pth'
