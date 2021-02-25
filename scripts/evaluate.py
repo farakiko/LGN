@@ -35,6 +35,9 @@ import seaborn as sns
 
 # given a model, evaluate it on test data: (1) plot roc curves (2) plot confusion matrix
 def Evaluate(args, model, epoch, test_loader, outpath):
+
+    t0 = time.time()
+
     model.eval()
 
     preds = []
@@ -96,6 +99,9 @@ def Evaluate(args, model, epoch, test_loader, outpath):
     plt.savefig(outpath + '/Roc_curves_log_epoch_' + str(epoch+1) + '.png')
     plt.close(fig)
 
+    t1 = time.time()
+    print("Time it took testing epoch", epoch+1, "is:", round((t1-t0)/60,2), "min")
+
     return acc
 
 
@@ -110,58 +116,6 @@ def plot_confusion_matrix(confusion_matrix, epoch, outpath):
     plt.savefig(outpath + '/confusion_matrix_epoch_' + str(epoch+1) + '.png')
     plt.close(fig)
 
-
-# # use this while training
-# # generate one confusion matrix per epoch
-# # append this result to a list
-# def generate_confusion_matrix(preds, labels, num_classes=2):
-#     predictions_list = torch.clone(preds).tolist()
-#     labels_list = torch.clone(labels).tolist()
-#     confusion_matrix = np.zeros((num_classes, num_classes)) # 2 class
-#     for i in range(len(preds)):
-#         confusion_matrix[predictions_list[i]][labels_list[i]] += 1
-#         # 0: false 1: true
-#     return confusion_matrix
-#
-# # normalization
-# def normalize_confusion_matrices(confusion_matrices):
-#     confusion_matrices_normalized = []
-#     for epoch in range(len(confusion_matrices)):
-#         confusion_matrix = np.array(confusion_matrices[epoch], dtype=float)
-#         for label in range(len(confusion_matrix)):
-#             row = confusion_matrix[label]
-#             row = row / row.sum() if row.sum() !=0 else 0
-#             confusion_matrix[label] = row
-#         confusion_matrices_normalized.append(confusion_matrix.tolist())
-#     return confusion_matrices_normalized
-#
-# # # e.g. labels = ["background", "signal"]
-# # def plot_confusion_matrix(confusion_matrices, epoch, labels=["background", "signal"], normalize=True, save=True, savepath=None, format='png'):
-# #     if normalize:
-# #         confusion_matrices = normalize_confusion_matrices(confusion_matrices)
-# #
-# #     fig = plt.figure()
-# #     ax = fig.add_subplot(111)
-# #     if normalize:
-# #         cax = ax.matshow(confusion_matrices, interpolation='nearest',cmap='viridis', vmin=0, vmax=1)
-# #     else:
-# #         cax = ax.matshow(confusion_matrices, interpolation='nearest',cmap='viridis')
-# #     fig.colorbar(cax)
-# #
-# #     ax.set_xticklabels(['']+labels)
-# #     ax.set_yticklabels(['']+labels)
-# #
-# #     for (i, j), z in np.ndenumerate(confusion_matrices):
-# #         ax.text(j, i, '{:0.1f}'.format(z), ha='center', va='center')
-# #
-# #     ax.set_title("Confusion Matrix at Epoch" + str(epoch+1))
-# #     ax.set_xlabel("Predicted Labels")
-# #     ax.set_ylabel("Actual Labels")
-# #
-# #     fig.tight_layout()
-# #
-# #     if save:
-# #         plt.savefig(savepath+"/confusion_matrix_epoch_{}.".format(epoch+1) +format, bbox_inches="tight")
 
 #---------------------------------------------------------------------------------
 

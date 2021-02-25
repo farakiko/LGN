@@ -143,18 +143,11 @@ if __name__ == "__main__":
 
                 # evaluate the model
                 print("Now testing the model for epoch =", epoch+1)
-                t0 = time.time()
                 Evaluate(args, model, epoch, test_loader, outpath)
-                t1 = time.time()
-                print("Time it took testing epoch", epoch+1, "is:", round((t1-t0)/60,2), "min")
 
                 if args.test_equivariance:
-                    print("Now testing equivariance for epoch =", epoch)
-                    t0 = time.time()
-                    logging.basicConfig(level=logging.INFO)
-                    lgn_tests(model, test_loader, args, cg_dict=model.cg_dict)
-                    t1 = time.time()
-                    print("Time it took testing equivariance of epoch", epoch+1, "is:", round((t1-t0)/60,2), "min")
+                    print("Now testing equivariance for epoch =", epoch+1)
+                    lgn_tests(model, test_loader, args, cg_dict=model.cg_dict, epoch+1)
 
         # test over the last epoch only
         elif args.test:
@@ -163,26 +156,15 @@ if __name__ == "__main__":
 
             # evaluate the model
             print("Now testing the model for epoch =", args.num_epoch)
-            t0 = time.time()
             Evaluate(args, model, args.num_epoch-1, test_loader, outpath)
-            t1 = time.time()
-            print("Time it took testing epoch", args.num_epoch, "is:", round((t1-t0)/60,2), "min")
 
             if args.test_equivariance:
                 print("Now testing equivariance for epoch =", args.num_epoch)
-                t0 = time.time()
-                logging.basicConfig(level=logging.INFO)
-                lgn_tests(model, test_loader, args, cg_dict=model.cg_dict)
-                t1 = time.time()
-                print("Time it took testing equivariance of epoch", args.num_epoch, "is:", round((t1-t0)/60,2), "min")
+                lgn_tests(model, test_loader, args, cg_dict=model.cg_dict, args.num_epoch)
 
         elif args.test_equivariance:
             print("Now testing equivariance for epoch =", args.num_epoch)
-            t0 = time.time()
-            logging.basicConfig(level=logging.INFO)
-            lgn_tests(model, test_loader, args, cg_dict=model.cg_dict)
-            t1 = time.time()
-            print("Time it took testing equivariance of epoch", args.num_epoch, "is:", round((t1-t0)/60,2), "min")
+            lgn_tests(model, test_loader, args, cg_dict=model.cg_dict, args.num_epoch)
 
     if args.load:
         if args.test_over_all_epoch:
@@ -194,18 +176,11 @@ if __name__ == "__main__":
 
                 # evaluate the model
                 print("Now testing the loaded model for epoch =", epoch+1)
-                t0 = time.time()
                 Evaluate(args, model, epoch, test_loader, outpath)
-                t1 = time.time()
-                print("Time it took testing epoch", epoch+1, "is:", round((t1-t0)/60,2), "min")
 
                 if args.test_equivariance:
                     print("Now testing equivariance for epoch =", epoch+1)
-                    t0 = time.time()
-                    logging.basicConfig(level=logging.INFO)
-                    lgn_tests(model, test_loader, args, cg_dict=model.cg_dict)
-                    t1 = time.time()
-                    print("Time it took testing equivariance of epoch", epoch+1, "is:", round((t1-t0)/60,2), "min")
+                    lgn_tests(model, test_loader, args, cg_dict=model.cg_dict, epoch+1)
 
         elif args.test:
             # load the desired model
@@ -214,18 +189,11 @@ if __name__ == "__main__":
             model.load_state_dict(torch.load(PATH, map_location=device))
             # test only the chosen epoch
             print("Now testing the loaded model for epoch =", args.load_epoch)
-            t0 = time.time()
             Evaluate(args, model, args.load_epoch-1, test_loader, outpath)
-            t1 = time.time()
-            print("Time it took testing epoch", args.load_epoch, "is:", round((t1-t0)/60,2), "min")
 
             if args.test_equivariance:
                 print("Now testing equivariance for epoch =", args.load_epoch)
-                t0 = time.time()
-                logging.basicConfig(level=logging.INFO)
-                lgn_tests(model, test_loader, args, cg_dict=model.cg_dict)
-                t1 = time.time()
-                print("Time it took testing equivariance of epoch", args.load_epoch, "is:", round((t1-t0)/60,2), "min")
+                lgn_tests(model, test_loader, args, cg_dict=model.cg_dict, args.load_epoch)
 
         elif args.test_equivariance:
             # load the desired model
@@ -234,11 +202,7 @@ if __name__ == "__main__":
             model.load_state_dict(torch.load(PATH, map_location=device))
 
             print("Now testing equivariance for epoch =", args.load_epoch)
-            t0 = time.time()
-            logging.basicConfig(level=logging.INFO)
-            lgn_tests(model, test_loader, args, cg_dict=model.cg_dict)
-            t1 = time.time()
-            print("Time it took testing equivariance of epoch", args.load_epoch, "is:", round((t1-t0)/60,2), "min")
+            lgn_tests(model, test_loader, args, cg_dict=model.cg_dict, args.load_epoch)
 
 
 

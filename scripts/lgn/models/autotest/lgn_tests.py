@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+import time
 import numpy.matlib
 from torch.utils.data import DataLoader
 from math import sqrt, pi, cosh
@@ -151,7 +152,10 @@ def batch_test(model, data):
 	logging.info('Batch invariance test error: {}'.format(invariance_test))
 
 
-def lgn_tests(model, dataloader, args, tests=['covariance','permutation','batch'], cg_dict=None):
+def lgn_tests(model, dataloader, args, tests=['covariance','permutation','batch'], cg_dict=None, epoch):
+
+    t0 = time.time()
+    logging.basicConfig(level=logging.INFO)
 
 	logging.info("Testing network for symmetries:")
 	model.eval()
@@ -165,3 +169,6 @@ def lgn_tests(model, dataloader, args, tests=['covariance','permutation','batch'
 		batch_test(model, data)
 
 	logging.info('Test complete!')
+
+	t1 = time.time()
+	print("Time it took testing equivariance of epoch", epoch, "is:", round((t1-t0)/60,2), "min")
