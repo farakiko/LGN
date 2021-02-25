@@ -128,8 +128,9 @@ if __name__ == "__main__":
         else:
             # get directory name for the model to train
             outpath = create_model_folder(args, model)
-            # define an optimizer
-            optimizer = torch.optim.Adam(model.parameters(), args.lr_init)
+
+        # define an optimizer
+        optimizer = torch.optim.Adam(model.parameters(), args.lr_init)
 
         # start the training loop
         train_loop(args, model, optimizer, outpath, train_loader, valid_loader, device)
