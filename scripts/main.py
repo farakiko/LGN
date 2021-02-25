@@ -20,8 +20,7 @@ import json
 import pickle
 
 import logging
-logging.basicConfig(level=logging.INFO)
-logging.basicConfig(filename='app.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
+
 
 from tqdm import tqdm
 import time
@@ -152,6 +151,7 @@ if __name__ == "__main__":
                 if args.test_equivariance:
                     print("Now testing equivariance for epoch =", epoch)
                     t0 = time.time()
+                    logging.basicConfig(level=logging.INFO)
                     lgn_tests(model, test_loader, args, cg_dict=model.cg_dict)
                     t1 = time.time()
                     print("Time it took testing equivariance of epoch", epoch+1, "is:", round((t1-t0)/60,2), "min")
@@ -171,6 +171,7 @@ if __name__ == "__main__":
             if args.test_equivariance:
                 print("Now testing equivariance for epoch =", args.num_epoch)
                 t0 = time.time()
+                logging.basicConfig(level=logging.INFO)
                 lgn_tests(model, test_loader, args, cg_dict=model.cg_dict)
                 t1 = time.time()
                 print("Time it took testing equivariance of epoch", args.num_epoch, "is:", round((t1-t0)/60,2), "min")
@@ -178,6 +179,7 @@ if __name__ == "__main__":
         elif args.test_equivariance:
             print("Now testing equivariance for epoch =", args.num_epoch)
             t0 = time.time()
+            logging.basicConfig(level=logging.INFO)
             lgn_tests(model, test_loader, args, cg_dict=model.cg_dict)
             t1 = time.time()
             print("Time it took testing equivariance of epoch", args.num_epoch, "is:", round((t1-t0)/60,2), "min")
@@ -200,6 +202,7 @@ if __name__ == "__main__":
                 if args.test_equivariance:
                     print("Now testing equivariance for epoch =", epoch+1)
                     t0 = time.time()
+                    logging.basicConfig(level=logging.INFO)
                     lgn_tests(model, test_loader, args, cg_dict=model.cg_dict)
                     t1 = time.time()
                     print("Time it took testing equivariance of epoch", epoch+1, "is:", round((t1-t0)/60,2), "min")
@@ -219,6 +222,7 @@ if __name__ == "__main__":
             if args.test_equivariance:
                 print("Now testing equivariance for epoch =", args.load_epoch)
                 t0 = time.time()
+                logging.basicConfig(level=logging.INFO)
                 lgn_tests(model, test_loader, args, cg_dict=model.cg_dict)
                 t1 = time.time()
                 print("Time it took testing equivariance of epoch", args.load_epoch, "is:", round((t1-t0)/60,2), "min")
@@ -231,6 +235,7 @@ if __name__ == "__main__":
 
             print("Now testing equivariance for epoch =", args.load_epoch)
             t0 = time.time()
+            logging.basicConfig(level=logging.INFO)
             lgn_tests(model, test_loader, args, cg_dict=model.cg_dict)
             t1 = time.time()
             print("Time it took testing equivariance of epoch", args.load_epoch, "is:", round((t1-t0)/60,2), "min")
