@@ -147,7 +147,7 @@ if __name__ == "__main__":
 
                 if args.test_equivariance:
                     print("Now testing equivariance for epoch =", epoch+1)
-                    lgn_tests(model, test_loader, args, cg_dict=model.cg_dict, epoch+1)
+                    lgn_tests(model, test_loader, args, epoch+1, cg_dict=model.cg_dict)
 
         # test over the last epoch only
         elif args.test:
@@ -160,11 +160,11 @@ if __name__ == "__main__":
 
             if args.test_equivariance:
                 print("Now testing equivariance for epoch =", args.num_epoch)
-                lgn_tests(model, test_loader, args, cg_dict=model.cg_dict, args.num_epoch)
+                lgn_tests(model, test_loader, args,  args.num_epoch, cg_dict=model.cg_dict)
 
         elif args.test_equivariance:
             print("Now testing equivariance for epoch =", args.num_epoch)
-            lgn_tests(model, test_loader, args, cg_dict=model.cg_dict, args.num_epoch)
+            lgn_tests(model, test_loader, args, args.num_epoch, cg_dict=model.cg_dict)
 
     if args.load:
         if args.test_over_all_epoch:
@@ -180,7 +180,7 @@ if __name__ == "__main__":
 
                 if args.test_equivariance:
                     print("Now testing equivariance for epoch =", epoch+1)
-                    lgn_tests(model, test_loader, args, cg_dict=model.cg_dict, epoch+1)
+                    lgn_tests(model, test_loader, args, epoch+1, cg_dict=model.cg_dict)
 
         elif args.test:
             # load the desired model
@@ -193,7 +193,7 @@ if __name__ == "__main__":
 
             if args.test_equivariance:
                 print("Now testing equivariance for epoch =", args.load_epoch)
-                lgn_tests(model, test_loader, args, cg_dict=model.cg_dict, args.load_epoch)
+                lgn_tests(model, test_loader, args, args.load_epoc, cg_dict=model.cg_dict)
 
         elif args.test_equivariance:
             # load the desired model
@@ -202,7 +202,7 @@ if __name__ == "__main__":
             model.load_state_dict(torch.load(PATH, map_location=device))
 
             print("Now testing equivariance for epoch =", args.load_epoch)
-            lgn_tests(model, test_loader, args, cg_dict=model.cg_dict, args.load_epoch)
+            lgn_tests(model, test_loader, args, args.load_epoch, cg_dict=model.cg_dict)
 
 
 
