@@ -152,9 +152,6 @@ def batch_test(model, data):
 
 
 def lgn_tests(model, dataloader, args, tests=['covariance','permutation','batch'], cg_dict=None):
-	if not args.test:
-		logging.info("WARNING: network tests disabled!")
-		return
 
 	logging.info("Testing network for symmetries:")
 	model.eval()

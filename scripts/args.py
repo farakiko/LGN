@@ -18,15 +18,19 @@ def setup_argparse():
                         help='Train or evaluate model. (train | eval)')
 
     # farouk added those:
-    parser.add_argument("--patience", type=int, default=100, help="patience before early stopping")
+    parser.add_argument("--patience", type=int, default=10, help="patience before early stopping")
     parser.add_argument("--outpath", type=str, default = 'trained_models/', help="Output folder")
     parser.add_argument("--train", action=BoolArg, default=True, help="Start training a model")
     parser.add_argument("--load", action=BoolArg, default=False, help="Load a pre-trained model")
-    parser.add_argument("--test", action=BoolArg, default=True, help="Test the model.. make roc curves & confusion matrix")
+    parser.add_argument("--load-to-train", action=BoolArg, default=False, help="Load & keep training")
+
     parser.add_argument("--test-over-all-epoch", action=BoolArg, default=False, help="Test the model over all trained epochs.")
-    parser.add_argument("--load-model", type=str, default='LGNTopTag_model#four_epochs_batch32_with_acc', help="Path to the model to be loaded")
-    parser.add_argument("--load-epoch", type=int, default=-1, help="Specefication of which epoch to load. Set to -1 to test over all the epochs the model has trained on. MUST MAKE SURE THAT num-epoch IS CONSISTENT.")
-    parser.add_argument('--batch-size-test', type=int, default=24, metavar='N', help='Batch size for test_loader.')
+    parser.add_argument("--test", action=BoolArg, default=True, help="Test the model.. make roc curves & confusion matrix")
+    parser.add_argument("--test-equivariance", action=BoolArg, default=True, help="Test equivariance of the model")
+
+    parser.add_argument("--load-model", type=str, default='lgnjobbig', help="Path to the model to be loaded")
+    parser.add_argument("--load-epoch", type=int, default=1, help="Specefication of which epoch to load")
+    parser.add_argument('--batch-size-test', type=int, default=24, metavar='N', help='Batch size for test_loader')
 
     # Optimizer options
     parser.add_argument('--num-epoch', type=int, default=1, metavar='N',

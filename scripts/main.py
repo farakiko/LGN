@@ -14,9 +14,14 @@ from args import setup_argparse
 
 from data_processing.make_pytorch_data import initialize_datasets, data_to_loader
 from lgn.models.lgn_toptag import LGNTopTag
+from lgn.models.autotest import lgn_tests
 
 import json
 import pickle
+
+import logging
+logging.basicConfig(level=logging.INFO)
+logging.basicConfig(filename='app.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
 
 from tqdm import tqdm
 import time
@@ -77,8 +82,7 @@ if __name__ == "__main__":
     #         self.__dict__ = d
     #
     # args = objectview({"num_train": 200, "num_valid": 200, "num_test": 200, "task": "train", "num_epoch": 1, "batch_size": 2, "batch_group_size": 1, "weight_decay": 0, "cutoff_decay": 0, "lr_init": 0.001, "lr_final": 1e-05, "lr_decay": 9999, "lr_decay_type": "cos", "lr_minibatch": True, "sgd_restart": -1, "optim": "amsgrad", "parallel": False, "shuffle": True, "seed": 1, "alpha": 50, "save": True, "test": True, "log_level": "info", "textlog": True, "predict": True, "quiet": True, "prefix": "nosave", "loadfile": "", "checkfile": "", "bestfile": "", "logfile": "", "predictfile": "", "workdir": "./", "logdir": "log/", "modeldir": "model/", "predictdir": "predict/", "datadir": "data/", "dataset": "jet", "target": "is_signal", "add_beams": False, "beam_mass": 1, "force_download": False, "cuda": True, "dtype": "float", "num_workers": 0, "pmu_in": False, "num_cg_levels": 3, "mlp_depth": 3, "mlp_width": 2, "maxdim": [3], "max_zf": [1], "num_channels": [2, 3, 4, 3], "level_gain": [1.0], "cutoff_type": ["learn"], "num_basis_fn": 10, "scale": 0.005, "full_scalars": False, "mlp": True, "activation": "leakyrelu", "weight_init": "randn", "input": "linear", "num_mpnn_levels": 1, "top": "linear", "gaussian_mask": False,
-    # 'patience': 100, 'outpath': 'trained_models/', 'train': True, 'load': True, 'test': True,
-    # 'load_model': 'LGNTopTag_model#four_epochs_batch32', 'load_epoch': 0})
+    # 'patience': 10, 'outpath': 'trained_models/', 'train': False, 'load': True, 'load_to_train':False, 'test_over_all_epoch': False, 'test': False, 'test_equivariance': True, 'load_model': 'lgnjobbig', 'load_epoch': 0, 'batch_size_test': 24})
 
     with open("args_cache.json", "w") as f:
         json.dump(vars(args), f)
@@ -111,16 +115,21 @@ if __name__ == "__main__":
                       device=device, dtype=dtype)
 
     if (next(model.parameters()).is_cuda):
-        print('model is indeed training on gpu..')
+        print('model is initialized on gpu..')
     else:
-        print('model is not training on gpu..')
+        print('model is initialized on gpu..')
 
     if args.train:
-        # get directory name for the model to train
-        outpath = create_model_folder(args, model)
-
-        # define an optimizer
-        optimizer = torch.optim.Adam(model.parameters(), args.lr_init)
+        if args.load_to_train:
+            # load the desired model to further train it
+            outpath = args.outpath + args.load_model
+            PATH = outpath + '/epoch_' + str(args.load_epoch) + '_weights.pth'
+            model.load_state_dict(torch.load(PATH, map_location=device))
+        else:
+            # get directory name for the model to train
+            outpath = create_model_folder(args, model)
+            # define an optimizer
+            optimizer = torch.optim.Adam(model.parameters(), args.lr_init)
 
         # start the training loop
         train_loop(args, model, optimizer, outpath, train_loader, valid_loader, device)
@@ -134,20 +143,46 @@ if __name__ == "__main__":
 
                 # evaluate the model
                 print("Now testing the model for epoch =", epoch+1)
+                t0 = time.time()
                 Evaluate(args, model, epoch, test_loader, outpath)
+                t1 = time.time()
+                print("Time it took testing epoch", epoch+1, "is:", round((t1-t0)/60,2), "min")
 
-        # test the model over the last epoch only
+                if args.test_equivariance:
+                    print("Now testing equivariance for epoch =", epoch)
+                    t0 = time.time()
+                    lgn_tests(model, test_loader, args, cg_dict=model.cg_dict)
+                    t1 = time.time()
+                    print("Time it took testing equivariance of epoch", epoch+1, "is:", round((t1-t0)/60,2), "min")
+
+        # test over the last epoch only
         elif args.test:
             PATH = outpath + '/epoch_' + str(args.num_epoch) + '_weights.pth'
             model.load_state_dict(torch.load(PATH, map_location=device))
 
             # evaluate the model
             print("Now testing the model for epoch =", args.num_epoch)
+            t0 = time.time()
             Evaluate(args, model, args.num_epoch-1, test_loader, outpath)
+            t1 = time.time()
+            print("Time it took testing epoch", args.num_epoch, "is:", round((t1-t0)/60,2), "min")
 
+            if args.test_equivariance:
+                print("Now testing equivariance for epoch =", args.num_epoch)
+                t0 = time.time()
+                lgn_tests(model, test_loader, args, cg_dict=model.cg_dict)
+                t1 = time.time()
+                print("Time it took testing equivariance of epoch", args.num_epoch, "is:", round((t1-t0)/60,2), "min")
+
+        elif args.test_equivariance:
+            print("Now testing equivariance for epoch =", args.num_epoch)
+            t0 = time.time()
+            lgn_tests(model, test_loader, args, cg_dict=model.cg_dict)
+            t1 = time.time()
+            print("Time it took testing equivariance of epoch", args.num_epoch, "is:", round((t1-t0)/60,2), "min")
 
     if args.load:
-        if args.load_epoch == -1:
+        if args.test_over_all_epoch:
             for epoch in range(args.num_epoch):
                 # load the correct model per epoch
                 outpath = args.outpath + args.load_model
@@ -155,16 +190,50 @@ if __name__ == "__main__":
                 model.load_state_dict(torch.load(PATH, map_location=device))
 
                 # evaluate the model
-                print("Now testing the loaded model for epoch =", epoch)
+                print("Now testing the loaded model for epoch =", epoch+1)
+                t0 = time.time()
                 Evaluate(args, model, epoch, test_loader, outpath)
+                t1 = time.time()
+                print("Time it took testing epoch", epoch+1, "is:", round((t1-t0)/60,2), "min")
 
-        else:
+                if args.test_equivariance:
+                    print("Now testing equivariance for epoch =", epoch+1)
+                    t0 = time.time()
+                    lgn_tests(model, test_loader, args, cg_dict=model.cg_dict)
+                    t1 = time.time()
+                    print("Time it took testing equivariance of epoch", epoch+1, "is:", round((t1-t0)/60,2), "min")
+
+        elif args.test:
             # load the desired model
             outpath = args.outpath + args.load_model
             PATH = outpath + '/epoch_' + str(args.load_epoch) + '_weights.pth'
             model.load_state_dict(torch.load(PATH, map_location=device))
             # test only the chosen epoch
+            print("Now testing the loaded model for epoch =", args.load_epoch)
+            t0 = time.time()
             Evaluate(args, model, args.load_epoch-1, test_loader, outpath)
+            t1 = time.time()
+            print("Time it took testing epoch", args.load_epoch, "is:", round((t1-t0)/60,2), "min")
+
+            if args.test_equivariance:
+                print("Now testing equivariance for epoch =", args.load_epoch)
+                t0 = time.time()
+                lgn_tests(model, test_loader, args, cg_dict=model.cg_dict)
+                t1 = time.time()
+                print("Time it took testing equivariance of epoch", args.load_epoch, "is:", round((t1-t0)/60,2), "min")
+
+        elif args.test_equivariance:
+            # load the desired model
+            outpath = args.outpath + args.load_model
+            PATH = outpath + '/epoch_' + str(args.load_epoch) + '_weights.pth'
+            model.load_state_dict(torch.load(PATH, map_location=device))
+
+            print("Now testing equivariance for epoch =", args.load_epoch)
+            t0 = time.time()
+            lgn_tests(model, test_loader, args, cg_dict=model.cg_dict)
+            t1 = time.time()
+            print("Time it took testing equivariance of epoch", args.load_epoch, "is:", round((t1-t0)/60,2), "min")
+
 
 
 # with open('trained_models/LGNTopTag_model#four_epochs_batch32/fractional_loss_train.pkl', 'rb') as f:  # Python 3: open(..., 'rb')
