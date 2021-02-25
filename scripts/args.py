@@ -32,6 +32,8 @@ def setup_argparse():
     parser.add_argument("--load-epoch", type=int, default=1, help="Specefication of which epoch to load")
     parser.add_argument('--batch-size-test', type=int, default=24, metavar='N', help='Batch size for test_loader')
 
+    parser.add_argument("--logging", action=BoolArg, default=False, help="if you want to print all logging info")
+
     # Optimizer options
     parser.add_argument('--num-epoch', type=int, default=1, metavar='N',
                         help='number of epochs to train.')

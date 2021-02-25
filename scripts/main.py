@@ -21,7 +21,6 @@ import pickle
 
 import logging
 
-
 from tqdm import tqdm
 import time
 import numpy as np
@@ -81,7 +80,10 @@ if __name__ == "__main__":
     #         self.__dict__ = d
     #
     # args = objectview({"num_train": 200, "num_valid": 200, "num_test": 200, "task": "train", "num_epoch": 1, "batch_size": 2, "batch_group_size": 1, "weight_decay": 0, "cutoff_decay": 0, "lr_init": 0.001, "lr_final": 1e-05, "lr_decay": 9999, "lr_decay_type": "cos", "lr_minibatch": True, "sgd_restart": -1, "optim": "amsgrad", "parallel": False, "shuffle": True, "seed": 1, "alpha": 50, "save": True, "test": True, "log_level": "info", "textlog": True, "predict": True, "quiet": True, "prefix": "nosave", "loadfile": "", "checkfile": "", "bestfile": "", "logfile": "", "predictfile": "", "workdir": "./", "logdir": "log/", "modeldir": "model/", "predictdir": "predict/", "datadir": "data/", "dataset": "jet", "target": "is_signal", "add_beams": False, "beam_mass": 1, "force_download": False, "cuda": True, "dtype": "float", "num_workers": 0, "pmu_in": False, "num_cg_levels": 3, "mlp_depth": 3, "mlp_width": 2, "maxdim": [3], "max_zf": [1], "num_channels": [2, 3, 4, 3], "level_gain": [1.0], "cutoff_type": ["learn"], "num_basis_fn": 10, "scale": 0.005, "full_scalars": False, "mlp": True, "activation": "leakyrelu", "weight_init": "randn", "input": "linear", "num_mpnn_levels": 1, "top": "linear", "gaussian_mask": False,
-    # 'patience': 10, 'outpath': 'trained_models/', 'train': False, 'load': True, 'load_to_train':False, 'test_over_all_epoch': False, 'test': False, 'test_equivariance': True, 'load_model': 'lgnjobbig', 'load_epoch': 0, 'batch_size_test': 24})
+    # 'patience': 10, 'outpath': 'trained_models/', 'train': False, 'load': True, 'load_to_train':False, 'test_over_all_epoch': False, 'test': False, 'test_equivariance': True, 'load_model': 'lgnjobbig', 'load_epoch': 0, 'batch_size_test': 24, 'logging':False})
+
+    if args.logging:
+        logging.basicConfig(level=logging.INFO)
 
     with open("args_cache.json", "w") as f:
         json.dump(vars(args), f)
