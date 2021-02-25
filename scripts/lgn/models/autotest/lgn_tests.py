@@ -154,9 +154,9 @@ def batch_test(model, data):
 
 def lgn_tests(model, dataloader, args, epoch, tests=['covariance','permutation','batch'], cg_dict=None):
 
-    t0 = time.time()
-    logging.basicConfig(level=logging.INFO)
-
+	t0 = time.time()
+	logging.basicConfig(level=logging.INFO)
+	
 	logging.info("Testing network for symmetries:")
 	model.eval()
 
@@ -169,6 +169,5 @@ def lgn_tests(model, dataloader, args, epoch, tests=['covariance','permutation',
 		batch_test(model, data)
 
 	logging.info('Test complete!')
-
 	t1 = time.time()
 	print("Time it took testing equivariance of epoch", epoch, "is:", round((t1-t0)/60,2), "min")
