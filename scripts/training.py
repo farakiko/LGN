@@ -172,7 +172,7 @@ def train_loop(args, model, optimizer, outpath, train_loader, valid_loader, devi
         pickle.dump(losses_train, f)
 
     fig, ax = plt.subplots()
-    ax.plot(range(len(losses_valid)), losses_valid, label='test loss')
+    ax.plot(range(len(losses_valid)), losses_valid, label='valid loss')
     ax.set_xlabel('Epochs')
     ax.set_ylabel('Loss')
     ax.legend(loc='best')
