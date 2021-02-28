@@ -79,6 +79,8 @@ def Evaluate(args, model, epoch, test_loader, outpath):
 
     # make ROC curves
     fpr_gnn, tpr_gnn, threshold_gnn = roc_curve(targets, preds[:,1])
+    with open(outpath + '/Roc_curves_epoch_' + str(epoch+1) + '.pkl', 'wb') as f:
+        pickle.dump(confusion_matrix, f)
 
     fig, ax = plt.subplots()
     ax.plot(tpr_gnn, 1/fpr_gnn, lw=2.5, label="GNN, AUC = {:.1f}%".format(auc(fpr_gnn,tpr_gnn)*100))
