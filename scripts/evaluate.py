@@ -85,7 +85,7 @@ def Evaluate(args, model, epoch, test_loader, outpath):
         pickle.dump(tpr_gnn, f)
 
     fig, ax = plt.subplots()
-    ax.plot(tpr_gnn, 1/fpr_gnn, lw=2.5, label="GNN, AUC = {:.1f}%".format(auc(fpr_gnn,tpr_gnn)*100))
+    ax.plot(tpr_gnn, 1/fpr_gnn, lw=2.5, label="AUC = {:.1f}%".format(auc(fpr_gnn,tpr_gnn)*100))
     ax.set_title("Roc curves at Epoch" + str(epoch+1))
     ax.set_xlabel(r'Signal efficiency "TPR"')
     ax.set_ylabel(r'Background rejection "1/FPR"')
@@ -94,7 +94,7 @@ def Evaluate(args, model, epoch, test_loader, outpath):
     plt.close(fig)
 
     fig, ax = plt.subplots()
-    ax.plot(tpr_gnn, 1/fpr_gnn, lw=2.5, label="GNN, AUC = {:.1f}%".format(auc(fpr_gnn,tpr_gnn)*100))
+    ax.plot(tpr_gnn, 1/fpr_gnn, lw=2.5, label="AUC = {:.1f}%".format(auc(fpr_gnn,tpr_gnn)*100))
     ax.set_title("Roc curves at Epoch" + str(epoch+1))
     ax.set_xlabel(r'Signal efficiency "TPR"')
     ax.set_ylabel(r'Background rejection "log(1/FPR)"')
