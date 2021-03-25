@@ -23,8 +23,8 @@ Here are our accuracy plots:
 
 
 <p float="left">
-  <img src="pics/ROC.png" alt="ROC" width="300"/>
-  <img src="pics/ConusionMatrix.png" alt="ConusionMatrix" width="300"/>
+  <img src="pics/ROC.png" alt="ROC" width="500"/>
+  <img src="pics/ConusionMatrix.png" alt="ConusionMatrix" width="400"/>
 </p>
 
 
