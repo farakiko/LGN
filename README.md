@@ -10,7 +10,7 @@ Neural networks which are Lorentz group equivariant are extremely desirable for 
 
 ## Training Result
 We have trained the LGN model for 20 epochs and here are our loss plots:
-<img src="https://github.com/faroukmokhtar/LGN/master/pics/loss.png" width="48">
+<img src="https://github.com/faroukmokhtar/LGN/tree/master/pics/loss.png" width="48">
 
 Here are our accuracy plots:
 ![example](/pics/acc.png)
