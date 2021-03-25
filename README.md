@@ -33,7 +33,7 @@ Here are our accuracy plots:
 
 <p float="left">
   <img src="pics/RotInv.png" alt="RotInv" width="500"/>
-  <img src="pics/BoostInv.png" alt="BoostInv" width="500"/>
+  <img src="pics/BoostInv.png" alt="BoostInv" width="700"/>
 </p>
 
 
