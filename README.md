@@ -32,8 +32,8 @@ Here are our accuracy plots:
 ### Physics Metrics
 
 <p float="left">
-  <img src="pics/RotInv.png" alt="RotInv" width="500"/>
-  <img src="pics/BoostInv.png" alt="BoostInv" width="550"/>
+  <img src="pics/RotInv.png" alt="RotInv" width="400"/>
+  <img src="pics/BoostInv.png" alt="BoostInv" width="450"/>
 </p>
 
 
