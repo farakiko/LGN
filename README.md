@@ -5,7 +5,7 @@ We attempt to build a Lorentz Group Equivariant Network (LGN); an ML model which
 This work is based on this repository: https://github.com/fizisist/LorentzGroupNetwork
 
 ## Abstract
-Neural networks which are Lorentz group equivariant are extremely desirable for high energy physics data. In this work, we attempt to build such a model and train it to the task of jet- classification. The model reaches state-of-the-art benchmark performance, in addition to passing a series of physics equivariance tests; suggesting a new realm of experimentation with physics equivariant models.
+Neural networks which are Lorentz group equivariant are extremely desirable for high energy physics data. In this work, we attempt to build such a model and train it to the task of jet-classification. The model reaches state-of-the-art performance, in addition to passing a series of physics equivariance tests; suggesting a new realm of experimentation with physics equivariant models.
 
 
 ## Training Result
