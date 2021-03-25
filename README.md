@@ -15,7 +15,7 @@ We have trained the LGN model for 20 epochs and here are our loss plots:
 
 Here are our accuracy plots:
 
-<img src="pics/acc.png" alt=acc width="480"/>
+<img src="pics/acc.png" alt=acc width="460"/>
 
 
 ## MODEL EVALUATION
@@ -32,8 +32,8 @@ Here are our accuracy plots:
 ### Physics Metrics
 
 <p float="left">
-  <img src="pics/RotInv.png" alt="RotInv" width="400"/>
-  <img src="pics/BoostInv.png" alt="BoostInv" width="450"/>
+  <img src="pics/RotInv.png" alt="RotInv" width="370"/>
+  <img src="pics/BoostInv.png" alt="BoostInv" width="420"/>
 </p>
 
 
