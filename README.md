@@ -19,14 +19,15 @@ Here are our accuracy plots:
 
 
 ## MODEL EVALUATION
-### Ml Metrics
-
-(a) Roc curves:
-<img src="pics/ROC.png" alt=ROC width="400"/>
+### Ml Metrics (Roc curves & Confusion Matrix)
 
 
-(b) Confusion Matrix plots:
-<img src="pics/ConusionMatrix.png" alt=ConusionMatrix width="400"/>
+<p float="left">
+  <img src="pics/ROC.png" alt="ROC" width="300"/>
+  <img src="pics/ConusionMatrix.png" alt="ConusionMatrix" width="300"/>
+</p>
+
+
 
 ### Physics Metrics
 
