@@ -22,20 +22,20 @@ Here are our accuracy plots:
 ### Ml Metrics
 
 (a) Roc curves:
-![example](/pics/ROC.png)
+<img src="pics/ROC.png" alt=ROC width="400"/>
 
 
 (b) Confusion Matrix plots:
-![example](/pics/ConusionMatrix.png)
+<img src="pics/ConusionMatrix.png" alt=ConusionMatrix width="400"/>
 
 ### Physics Metrics
 
 (a) Rotation Invariance test plot:
-![example](/pics/RotInv.png)
+<img src="pics/RotInv.png" alt=RotInv width="400"/>
 
 
 (b) Boost Invariance test plot::
-![example](/pics/BoostInv.png)
+<img src="pics/BoostInv.png" alt=BoostInv width="400"/>
 
 
 
