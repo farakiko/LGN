@@ -13,7 +13,7 @@ We have trained the LGN model for 20 epochs and here are our loss plots:
 <img src="https://github.com/faroukmokhtar/LGN/tree/master/pics/loss.png" | width="48">
 
 Here are our accuracy plots:
-![example](/pics/acc.png width=48)
+![example](/pics/acc.png | width=48)
 
 ## MODEL EVALUATION
 ### Ml Metrics
