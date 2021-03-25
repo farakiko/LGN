@@ -9,8 +9,7 @@ Neural networks which are Lorentz group equivariant are extremely desirable for 
 
 
 ## Result
-![alt text](https://github.com/faroukmokhtar/LGN/blob/master/ROC.png?raw=true)
-
+![example](/pics/ROC.png)
 
 
 ## Main reference: 
