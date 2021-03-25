@@ -10,12 +10,12 @@ Neural networks which are Lorentz group equivariant are extremely desirable for 
 
 ## Training Result
 We have trained the LGN model for 20 epochs and here are our loss plots:
-<img src="pics/loss.png" alt=loss width="500"/>
+<img src="pics/loss.png" alt=loss width="450"/>
 
 
 Here are our accuracy plots:
 
-<img src="pics/acc.png" alt=acc width="500"/>
+<img src="pics/acc.png" alt=acc width="450"/>
 
 
 ## MODEL EVALUATION
@@ -24,7 +24,7 @@ Here are our accuracy plots:
 
 <p float="left">
   <img src="pics/ROC.png" alt="ROC" width="400"/>
-  <img src="pics/ConusionMatrix.png" alt="ConusionMatrix" width="300"/>
+  <img src="pics/ConusionMatrix.png" alt="ConusionMatrix" width="350"/>
 </p>
 
 
@@ -32,8 +32,8 @@ Here are our accuracy plots:
 ### Physics Metrics
 
 <p float="left">
-  <img src="pics/RotInv.png" alt="RotInv" width="450"/>
-  <img src="pics/BoostInv.png" alt="BoostInv" width="500"/>
+  <img src="pics/RotInv.png" alt="RotInv" width="400"/>
+  <img src="pics/BoostInv.png" alt="BoostInv" width="450"/>
 </p>
 
 
